@@ -8,7 +8,7 @@
 <style>
   :root{
     --bg:#f6f4ef; --card:#fff; --ink:#1d1d1b; --muted:#6b6a65; --line:#e4e0d6;
-    --accent:#1f4d3a; --fav:#b97900; --soph:#7a2f74; --no:#a33a2c;
+    --accent:#1f4d3a; --fav:#b97900; --soph:#7a2f74; --rosa:#f48fb1; --azul:#7ec8f2; --no:#a33a2c;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -47,8 +47,17 @@
   .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .btn{font:inherit;font-weight:600;font-size:14px;border-radius:9px;padding:9px 14px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none}
   .btn.link{background:#111;border-color:#111;color:#fff}
-  .btn.fs[aria-pressed="true"]{background:var(--soph);border-color:var(--soph);color:#fff}
-  .btn.fm[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.fs{border-color:var(--rosa)}
+  .btn.fm{border-color:var(--azul)}
+  .btn.fs[aria-pressed="true"]{background:var(--rosa);border-color:#111;color:#111}
+  .btn.fm[aria-pressed="true"]{background:var(--azul);border-color:#111;color:#111}
+  .check{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;margin-left:6px;vertical-align:middle;color:#111;border:1px solid #111}
+  .check.s{background:var(--rosa)} .check.m{background:var(--azul)}
+  #fiesta{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+  #match{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);z-index:51;background:#111;color:#fff;border:3px solid var(--fav);border-radius:18px;padding:22px 34px;text-align:center;opacity:0;pointer-events:none;transition:opacity .35s, transform .35s;max-width:90vw}
+  #match.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #match b{display:block;font-size:34px;letter-spacing:.02em}
+  #match span{display:block;margin-top:6px;font-size:16px;color:#f3d48a}
   .btn.d[aria-pressed="true"]{background:var(--no);border-color:var(--no);color:#fff}
   .empty{text-align:center;color:var(--muted);padding:60px 20px}
   footer{max-width:1100px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:13px}
@@ -66,7 +75,7 @@
 </header>
 <nav>
   <div class="navin" role="tablist">
-    <button class="tab" role="tab" data-v="rev">Por revisar<span class="n" id="n-rev"></span></button>
+    <button class="tab" role="tab" data-v="rev">Todos los pisos<span class="n" id="n-rev"></span></button>
     <button class="tab" role="tab" data-v="fs">★ Favorito Sophie<span class="n" id="n-fs"></span></button>
     <button class="tab" role="tab" data-v="fm">★ Favorito Miguel<span class="n" id="n-fm"></span></button>
     <button class="tab sup" role="tab" data-v="sup">★★ SuperFavorito<span class="n" id="n-sup"></span></button>
@@ -81,9 +90,11 @@
   </div>
 </nav>
 <main id="lista"></main>
+<canvas id="fiesta"></canvas>
+<div id="match" role="status" aria-live="polite"></div>
 <footer>
   <p id="sync">Conectando…</p>
-  <p>Los favoritos y descartes son compartidos: lo que marque uno lo ve el otro en unos segundos. Fotos y datos: idealista.</p>
+  <p>Los favoritos y descartes son compartidos (rosa para Sophie, azul para Miguel): lo que marque uno lo ve el otro en unos segundos. Fotos y datos: idealista.</p>
 </footer>
 
 <script>
@@ -206,7 +217,7 @@ function tarjeta(p){
   return `<article class="card ${sup?"sup":""}">
     <div class="head">
       <div>
-        <h2>${p.titulo}<span class="badge ${p.origen==="S"?"s":""}">${p.origen==="S"?"De Sophie":"De Miguel"}</span>${sup?'<span class="badge sup">★★ SuperFavorito</span>':""}</h2>
+        <h2>${p.titulo}<span class="badge ${p.origen==="S"?"s":""}">${p.origen==="S"?"De Sophie":"De Miguel"}</span>${e.s?'<span class="check s">✓ Sophie</span>':""}${e.m?'<span class="check m">✓ Miguel</span>':""}${sup?'<span class="badge sup">★★ SuperFavorito</span>':""}</h2>
         <div class="zona">${p.zona}, Madrid · ${p.hab} hab. · ${p.planta}</div>
       </div>
       <div class="nums">
@@ -221,8 +232,8 @@ function tarjeta(p){
       <ul class="chips">${p.det.map(d=>`<li>${d}</li>`).join("")}</ul>
       <div class="acts">
         <a class="btn link" href="https://www.idealista.com/inmueble/${p.id}/" target="_blank" rel="noopener">Ver anuncio en idealista ↗</a>
-        <button class="btn fs" aria-pressed="${!!e.s}" onclick="marcar('${p.id}','s')">★ Favorito Sophie</button>
-        <button class="btn fm" aria-pressed="${!!e.m}" onclick="marcar('${p.id}','m')">★ Favorito Miguel</button>
+        <button class="btn fs" aria-pressed="${!!e.s}" onclick="marcar('${p.id}','s')">${e.s?"✓":"★"} Favorito Sophie</button>
+        <button class="btn fm" aria-pressed="${!!e.m}" onclick="marcar('${p.id}','m')">${e.m?"✓":"★"} Favorito Miguel</button>
         <button class="btn d" aria-pressed="${!!e.d}" onclick="marcar('${p.id}','d')">✕ ${e.d?"Descartado":"Descartar"}</button>
       </div>
     </div>
@@ -230,19 +241,65 @@ function tarjeta(p){
 }
 
 const FILTRO = {
-  rev: e => !e.s && !e.m && !e.d,
+  rev: e => !e.d,
   fs:  e => !!e.s,
   fm:  e => !!e.m,
   sup: e => !!(e.s && e.m),
   des: e => !!e.d
 };
+let superPrevios = null;
+function comprobarMatch(){
+  const ahora = PISOS.filter(p => esSuper(p.id)).map(p => p.id);
+  if (superPrevios) {
+    const nuevo = ahora.find(id => !superPrevios.includes(id));
+    if (nuevo) fiesta(PISOS.find(p => p.id === nuevo));
+  }
+  superPrevios = ahora;
+}
+
+function fiesta(p){
+  const cartel = document.getElementById("match");
+  cartel.innerHTML = `<b>★★ ¡Match! ★★</b><span>${p.titulo} · ${eur(p.precio)} €/mes<br>Nuevo SuperFavorito de Sophie y Miguel</span>`;
+  cartel.classList.add("on");
+  setTimeout(() => cartel.classList.remove("on"), 4200);
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.getElementById("fiesta"), x = c.getContext("2d");
+  const W = c.width = innerWidth, H = c.height = innerHeight;
+  const col = ["#f48fb1","#7ec8f2","#f5c542","#ffffff","#b97900","#ff6f91"];
+  const conf = Array.from({length: 190}, () => ({x: Math.random()*W, y: -20 - Math.random()*H*.6, vx: (Math.random()-.5)*3, vy: 2.5 + Math.random()*4, r: 5 + Math.random()*7, a: Math.random()*6.28, va: (Math.random()-.5)*.3, c: col[Math.floor(Math.random()*col.length)]}));
+  const est = Array.from({length: 9}, (_, i) => ({t0: i*330 + Math.random()*200, x: Math.random()*W*.8, y: Math.random()*H*.35, v: 9 + Math.random()*6, l: 90 + Math.random()*90}));
+  const t0 = performance.now(), DUR = 4500;
+  (function paso(t){
+    const d = t - t0; x.clearRect(0, 0, W, H);
+    const fade = d > DUR - 800 ? Math.max(0, (DUR - d)/800) : 1;
+    for (const s of est) {           // estrellas fugaces
+      const k = d - s.t0; if (k < 0 || k > 900) continue;
+      const px = s.x + k*s.v*.09*10/10 + k*.45, py = s.y + k*.28, al = (1 - k/900) * fade;
+      const g = x.createLinearGradient(px, py, px - s.l, py - s.l*.62);
+      g.addColorStop(0, "rgba(255,244,200,"+al+")"); g.addColorStop(1, "rgba(255,244,200,0)");
+      x.strokeStyle = g; x.lineWidth = 3; x.lineCap = "round";
+      x.beginPath(); x.moveTo(px, py); x.lineTo(px - s.l, py - s.l*.62); x.stroke();
+      x.fillStyle = "rgba(255,255,255,"+al+")"; x.beginPath(); x.arc(px, py, 3.5, 0, 6.28); x.fill();
+    }
+    x.globalAlpha = fade;
+    for (const q of conf) {          // confeti
+      q.x += q.vx; q.y += q.vy; q.a += q.va;
+      x.save(); x.translate(q.x, q.y); x.rotate(q.a); x.fillStyle = q.c;
+      x.fillRect(-q.r/2, -q.r/4, q.r, q.r/2); x.restore();
+    }
+    x.globalAlpha = 1;
+    if (d < DUR) requestAnimationFrame(paso); else x.clearRect(0, 0, W, H);
+  })(t0);
+}
+
 function pintar(){
+  comprobarMatch();
   const de = v => PISOS.filter(p => FILTRO[v](E(p.id)));
   Object.keys(FILTRO).forEach(v => document.getElementById("n-"+v).textContent = de(v).length);
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.v===vista));
   const o = document.getElementById("orden").value;
   const lista = de(vista).sort((a,b) => o==="precio" ? a.precio-b.precio : o==="m2" ? b.m2-a.m2 : a.precio/a.m2 - b.precio/b.m2);
-  const vacio = {rev:"No queda ninguna vivienda por revisar.", fs:"Sophie todavía no ha marcado ningún favorito.", fm:"Miguel todavía no ha marcado ningún favorito.", sup:"Todavía no hay ningún piso que sea favorito de los dos.", des:"No hay ninguna vivienda descartada."};
+  const vacio = {rev:"No queda ninguna vivienda: están todas descartadas.", fs:"Sophie todavía no ha marcado ningún favorito.", fm:"Miguel todavía no ha marcado ningún favorito.", sup:"Todavía no hay ningún piso que sea favorito de los dos.", des:"No hay ninguna vivienda descartada."};
   document.getElementById("lista").innerHTML = lista.length ? lista.map(tarjeta).join("") : `<p class="empty">${vacio[vista]}</p>`;
 }
 
