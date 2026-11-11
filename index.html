@@ -8,7 +8,7 @@
 <style>
   :root{
     --bg:#f6f4ef; --card:#fff; --ink:#1d1d1b; --muted:#6b6a65; --line:#e4e0d6;
-    --accent:#1f4d3a; --fav:#c98a00; --no:#a33a2c;
+    --accent:#1f4d3a; --fav:#b97900; --soph:#7a2f74; --no:#a33a2c;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -24,7 +24,10 @@
   select{font:inherit;font-size:14px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff}
   main{max-width:1100px;margin:0 auto;padding:20px}
   .card{background:var(--card);border:2px solid #111;border-radius:14px;margin-bottom:26px;overflow:hidden}
-  .card.fav{box-shadow:0 0 0 4px rgba(201,138,0,.55)}
+  .card.sup{box-shadow:0 0 0 4px var(--fav)}
+  .badge.sup{background:var(--fav);color:#fff}
+  .tab.sup[aria-selected="true"]{background:var(--fav);border-color:var(--fav)}
+  #enlace{width:100%;font:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px}
   .head{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;padding:18px 20px 12px;flex-wrap:wrap}
   .head h2{margin:0;font-size:19px}
   .zona{color:var(--muted);font-size:14px}
@@ -43,8 +46,9 @@
   .nota{font-size:14px;background:#faf3f9;border-left:3px solid #7a2f74;padding:8px 12px;border-radius:0 8px 8px 0;margin:0 0 12px}
   .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .btn{font:inherit;font-weight:600;font-size:14px;border-radius:9px;padding:9px 14px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none}
-  .btn.link{background:var(--accent);border-color:var(--accent);color:#fff}
-  .btn.f[aria-pressed="true"]{background:var(--fav);border-color:var(--fav);color:#fff}
+  .btn.link{background:#111;border-color:#111;color:#fff}
+  .btn.fs[aria-pressed="true"]{background:var(--soph);border-color:var(--soph);color:#fff}
+  .btn.fm[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.d[aria-pressed="true"]{background:var(--no);border-color:var(--no);color:#fff}
   .empty{text-align:center;color:var(--muted);padding:60px 20px}
   footer{max-width:1100px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:13px}
@@ -63,7 +67,9 @@
 <nav>
   <div class="navin" role="tablist">
     <button class="tab" role="tab" data-v="rev">Por revisar<span class="n" id="n-rev"></span></button>
-    <button class="tab" role="tab" data-v="fav">★ Favoritos<span class="n" id="n-fav"></span></button>
+    <button class="tab" role="tab" data-v="fs">★ Favorito Sophie<span class="n" id="n-fs"></span></button>
+    <button class="tab" role="tab" data-v="fm">★ Favorito Miguel<span class="n" id="n-fm"></span></button>
+    <button class="tab sup" role="tab" data-v="sup">★★ SuperFavorito<span class="n" id="n-sup"></span></button>
     <button class="tab" role="tab" data-v="des">✕ Descartados<span class="n" id="n-des"></span></button>
     <label class="sort">Ordenar
       <select id="orden">
@@ -75,7 +81,12 @@
   </div>
 </nav>
 <main id="lista"></main>
-<footer>Los favoritos y descartes se guardan en este navegador. Fotos y datos: idealista.</footer>
+<footer>
+  <p>Los favoritos y descartes se guardan en este navegador. Para juntar los de Sophie y los de Miguel, cada uno pulsa este botón en su dispositivo y le envía el enlace al otro.</p>
+  <p><button class="btn" id="compartir">Copiar enlace con mis marcas</button> <span id="copiado"></span></p>
+  <input id="enlace" readonly hidden aria-label="Enlace con mis marcas">
+  <p>Fotos y datos: idealista.</p>
+</footer>
 
 <script>
 const IMG = "https://img4.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/";
@@ -139,26 +150,55 @@ const PISOS = [
    det:["136 m² útiles","3 baños","Garaje incluido","Sin amueblar","Calefacción individual"]}
 ];
 
-const KEY = "pisos-madrid-estado";
+const KEY = "pisos-madrid-estado-v2";
+// estado[id] = {s: favorito de Sophie, m: favorito de Miguel, d: descartado}
 let estado = {};
 try { estado = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { estado = {}; }
+try { // migra las marcas de la primera versión (favorito -> favorito de Miguel)
+  const viejo = JSON.parse(localStorage.getItem("pisos-madrid-estado") || "null");
+  if (viejo && !Object.keys(estado).length) for (const id in viejo) estado[id] = viejo[id]==="fav" ? {m:true} : {d:true};
+} catch(e) {}
+const IDS = new Set(PISOS.map(p => p.id));
+// marcas recibidas por enlace (#s=id,id&m=id&d=id): se suman a las de este navegador
+try {
+  const h = new URLSearchParams(location.hash.slice(1));
+  let n = 0;
+  for (const k of ["s","m","d"]) (h.get(k)||"").split(",").filter(id => IDS.has(id)).forEach(id => { (estado[id] = estado[id]||{})[k] = true; n++; });
+  if (n) history.replaceState(null, "", location.pathname);
+} catch(e) {}
 let vista = "rev";
 const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch(e) {} };
+guardar();
 const eur = n => n.toLocaleString("es-ES");
 const src = p => p.startsWith("http") ? p : IMG + p;
+const E = id => estado[id] || {};
+const esSuper = id => !!(E(id).s && E(id).m);
 
-function marcar(id, v){
-  if (estado[id] === v) delete estado[id]; else estado[id] = v;
+function marcar(id, k){
+  const e = estado[id] = estado[id] || {};
+  e[k] = !e[k];
+  if (k === "d" && e.d) { e.s = false; e.m = false; }
+  if (k !== "d" && e[k]) e.d = false;
+  if (!e.s && !e.m && !e.d) delete estado[id];
   guardar(); pintar();
 }
 
+function enlace(){
+  const q = ["s","m","d"].map(k => { const ids = PISOS.filter(p => E(p.id)[k]).map(p => p.id); return ids.length ? k+"="+ids.join(",") : ""; }).filter(Boolean).join("&");
+  const url = location.origin + location.pathname + (q ? "#"+q : "");
+  const out = document.getElementById("enlace");
+  out.value = url; out.hidden = false; out.select();
+  const ok = () => { document.getElementById("copiado").textContent = "Enlace copiado: envíalo por WhatsApp y al abrirlo se sumarán tus marcas."; };
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, () => {}); 
+}
+
 function tarjeta(p){
-  const e = estado[p.id];
+  const e = E(p.id), sup = esSuper(p.id);
   const foto = (k, t) => `<figure><img loading="lazy" referrerpolicy="no-referrer" src="${src(p.fotos[k])}" alt="${t} · ${p.titulo}"><figcaption>${t}</figcaption></figure>`;
-  return `<article class="card ${e==="fav"?"fav":""}">
+  return `<article class="card ${sup?"sup":""}">
     <div class="head">
       <div>
-        <h2>${p.titulo}<span class="badge ${p.origen==="S"?"s":""}">${p.origen==="S"?"De Sophie":"De Miguel"}</span></h2>
+        <h2>${p.titulo}<span class="badge ${p.origen==="S"?"s":""}">${p.origen==="S"?"De Sophie":"De Miguel"}</span>${sup?'<span class="badge sup">★★ SuperFavorito</span>':""}</h2>
         <div class="zona">${p.zona}, Madrid · ${p.hab} hab. · ${p.planta}</div>
       </div>
       <div class="nums">
@@ -173,25 +213,34 @@ function tarjeta(p){
       <ul class="chips">${p.det.map(d=>`<li>${d}</li>`).join("")}</ul>
       <div class="acts">
         <a class="btn link" href="https://www.idealista.com/inmueble/${p.id}/" target="_blank" rel="noopener">Ver anuncio en idealista ↗</a>
-        <button class="btn f" aria-pressed="${e==="fav"}" onclick="marcar('${p.id}','fav')">★ ${e==="fav"?"Favorito":"Añadir a favoritos"}</button>
-        <button class="btn d" aria-pressed="${e==="des"}" onclick="marcar('${p.id}','des')">✕ ${e==="des"?"Descartado":"Descartar"}</button>
+        <button class="btn fs" aria-pressed="${!!e.s}" onclick="marcar('${p.id}','s')">★ Favorito Sophie</button>
+        <button class="btn fm" aria-pressed="${!!e.m}" onclick="marcar('${p.id}','m')">★ Favorito Miguel</button>
+        <button class="btn d" aria-pressed="${!!e.d}" onclick="marcar('${p.id}','d')">✕ ${e.d?"Descartado":"Descartar"}</button>
       </div>
     </div>
   </article>`;
 }
 
+const FILTRO = {
+  rev: e => !e.s && !e.m && !e.d,
+  fs:  e => !!e.s,
+  fm:  e => !!e.m,
+  sup: e => !!(e.s && e.m),
+  des: e => !!e.d
+};
 function pintar(){
-  const de = v => PISOS.filter(p => v==="rev" ? !estado[p.id] : estado[p.id]===v);
-  ["rev","fav","des"].forEach(v => document.getElementById("n-"+v).textContent = de(v).length);
+  const de = v => PISOS.filter(p => FILTRO[v](E(p.id)));
+  Object.keys(FILTRO).forEach(v => document.getElementById("n-"+v).textContent = de(v).length);
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.v===vista));
   const o = document.getElementById("orden").value;
   const lista = de(vista).sort((a,b) => o==="precio" ? a.precio-b.precio : o==="m2" ? b.m2-a.m2 : a.precio/a.m2 - b.precio/b.m2);
-  const vacio = {rev:"No queda ninguna vivienda por revisar.", fav:"Todavía no has marcado ningún favorito.", des:"No has descartado ninguna vivienda."};
+  const vacio = {rev:"No queda ninguna vivienda por revisar.", fs:"Sophie todavía no ha marcado ningún favorito.", fm:"Miguel todavía no ha marcado ningún favorito.", sup:"Todavía no hay ningún piso que sea favorito de los dos.", des:"No hay ninguna vivienda descartada."};
   document.getElementById("lista").innerHTML = lista.length ? lista.map(tarjeta).join("") : `<p class="empty">${vacio[vista]}</p>`;
 }
 
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => { vista = t.dataset.v; pintar(); window.scrollTo(0,0); });
 document.getElementById("orden").onchange = pintar;
+document.getElementById("compartir").onclick = enlace;
 pintar();
 </script>
 </body>
