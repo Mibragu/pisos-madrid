@@ -44,6 +44,12 @@
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:0;list-style:none}
   .chips li{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:#3c3b37}
   .nota{font-size:14px;background:#faf3f9;border-left:3px solid #7a2f74;padding:8px 12px;border-radius:0 8px 8px 0;margin:0 0 12px}
+  .cond{display:grid;grid-template-columns:auto 1fr auto;gap:0;margin:0 0 12px;border:1px solid #111;border-radius:10px;overflow:hidden}
+  .cond div{padding:8px 12px;border-left:1px solid #111}
+  .cond div:first-child{border-left:0}
+  .cond dt{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .cond dd{margin:2px 0 0;font-size:14px;font-weight:600}
+  @media (max-width:640px){.cond{grid-template-columns:1fr}.cond div{border-left:0;border-top:1px solid #111}.cond div:first-child{border-top:0}}
   .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .btn{font:inherit;font-weight:600;font-size:14px;border-radius:9px;padding:9px 14px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none}
   .btn.link{background:#111;border-color:#111;color:#fff}
@@ -156,8 +162,39 @@ const PISOS = [
    det:["2 baños","Terraza","Garaje incluido","Orientación sur y oeste","Sin amueblar","Calefacción central"]},
   {id:"112394498", origen:"M", titulo:"Piso en Calle de Juan Esplandiú", zona:"Estrella", precio:2700, m2:161, hab:3, planta:"14ª exterior, ascensor",
    fotos:{salon:"38/df/ae/1468559946.jpg", cocina:"17/14/c7/1468559965.jpg", dorm:"36/20/2c/1468559975.jpg"},
-   det:["136 m² útiles","3 baños","Garaje incluido","Sin amueblar","Calefacción individual"]}
+   det:["136 m² útiles","3 baños","Garaje incluido","Sin amueblar","Calefacción individual"]}  ,
+  {id:"1951799", origen:"M", titulo:"Ático en Calle Doctor Esquerdo, 157", zona:"Estrella", precio:2500, m2:107, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"92/cd/99/1482832120.jpg", cocina:"cd/f5/ce/1483559037.jpg", dorm:"f8/63/e5/1482832155.jpg"},
+   det:["80 m² útiles","2 baños","Terraza y balcón","Garaje opcional 150 €/mes","Trastero","Orientación sur y oeste","Sin amueblar"]},
+  {id:"113018974", origen:"M", titulo:"Ático en Prosperidad", zona:"Chamartín", precio:2550, m2:166, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"ff/c4/ae/1490103315.jpg", cocina:"c5/db/65/1490103272.jpg", dorm:"17/f1/66/1490103335.jpg"},
+   det:["2 baños","Terraza","Garaje opcional 120 €/mes","Sin amueblar","Calefacción central"]},
+  {id:"106856943", origen:"M", titulo:"Piso en Calle de Lope de Rueda, 31", zona:"Ibiza", precio:2600, m2:101, hab:3, planta:"4ª exterior, ascensor",
+   fotos:{salon:"https://img4.idealista.com/blur/WEB_DETAIL/90/id.pro.es.image.master/c0/63/71/1296023887.jpg", cocina:"be/f2/03/1490850054.jpg", dorm:"3e/8f/ae/1490850239.jpg"},
+   det:["2 baños","Balcón","Orientación oeste","Sin amueblar","Calefacción eléctrica","Aire acondicionado"]},
+  {id:"112932515", origen:"M", titulo:"Piso en Calle de Núñez de Balboa", zona:"Castellana", precio:2600, m2:110, hab:4, planta:"2ª exterior, ascensor",
+   fotos:{salon:"cd/73/fa/1487112995.jpg", cocina:"e0/38/06/1487113007.jpg", dorm:"af/13/45/1487112920.jpg"},
+   salonEtiqueta:"Estancia",
+   det:["94 m² útiles","3 baños","Terraza y balcón","Orientación sur","Sin amueblar","Calefacción central","Aire acondicionado"]},
+  {id:"112847366", origen:"M", titulo:"Piso en El Viso", zona:"Chamartín", precio:2650, m2:125, hab:3, planta:"1ª exterior, ascensor",
+   fotos:{salon:"25/82/98/1484180691.jpg", cocina:"d4/7c/93/1484180696.jpg", dorm:"f1/ae/71/1484180690.jpg"},
+   det:["107 m² útiles","3 baños","Orientación sur","Sin amueblar","Calefacción individual"]}
 ];
+
+// Condiciones leídas en cada anuncio (11 nov. 2026). Lo que el anuncio no indica queda "sin especificar".
+const COND = {
+  "1072388":   ["1 mes", "Aval bancario imprescindible, mínimo 6 mensualidades"],
+  "30181843":  ["1 mes", "Aval bancario imprescindible, mínimo 6 mensualidades"],
+  "112417150": ["1 mes", "2 meses de aval bancario"],
+  "106856943": ["1 mes", "1 mes de depósito de garantía; contrato por Plan Alquila o con seguro de impago"],
+  "111924115": ["1 mes", "1 mes de garantía adicional y el mes en curso; estudio de solvencia (seguro de alquiler)"],
+  "112528205": ["1 mes", "1 mes de garantía"],
+  "112699188": ["1 mes", "1 mes de garantía"],
+  "1951799": ["1 mes"], "110237391": ["1 mes"], "112532232": ["1 mes"], "112708661": ["1 mes"], "112832221": ["1 mes"],
+  "112837717": ["1 mes"], "112877321": ["1 mes"], "112900033": ["1 mes"], "112919990": ["1 mes"], "113018974": ["1 mes"]
+};
+const MESES = {"1 mes": 1};
+
 
 const KEY = "pisos-madrid-estado-v2";
 // estado[id] = {s: favorito de Sophie, m: favorito de Miguel, d: descartado}
@@ -172,7 +209,7 @@ const API = "https://script.google.com/macros/s/AKfycbxcPX1hiHnYlt0JLnlI4acaVq02
 let vista = "rev";
 const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch(e) {} };
 guardar();
-const eur = n => n.toLocaleString("es-ES");
+const eur = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 const src = p => p.startsWith("http") ? p : IMG + p;
 const E = id => estado[id] || {};
 const esSuper = id => !!(E(id).s && E(id).m);
@@ -211,6 +248,16 @@ function marcar(id, k){
   enviar(id, k, v);
 }
 
+function condiciones(p){
+  const c = COND[p.id] || [];
+  const fianza = c[0] ? `${c[0]} (${eur(p.precio * MESES[c[0]])} €)` : "sin especificar";
+  return `<dl class="cond">
+    <div><dt>Fianza</dt><dd>${fianza}</dd></div>
+    <div><dt>Garantías adicionales</dt><dd>${c[1] || "sin especificar"}</dd></div>
+    <div><dt>Contrato mínimo</dt><dd>sin especificar</dd></div>
+  </dl>`;
+}
+
 function tarjeta(p){
   const e = E(p.id), sup = esSuper(p.id);
   const foto = (k, t) => `<figure><img loading="lazy" referrerpolicy="no-referrer" src="${src(p.fotos[k])}" alt="${t} · ${p.titulo}"><figcaption>${t}</figcaption></figure>`;
@@ -229,6 +276,7 @@ function tarjeta(p){
     <div class="fotos">${foto("salon", p.salonEtiqueta||"Salón")}${foto("cocina","Cocina")}${foto("dorm", p.dormEtiqueta||"Dormitorio")}</div>
     <div class="body">
       ${p.nota?`<p class="nota"><strong>Sophie:</strong> ${p.nota}</p>`:""}
+      ${condiciones(p)}
       <ul class="chips">${p.det.map(d=>`<li>${d}</li>`).join("")}</ul>
       <div class="acts">
         <a class="btn link" href="https://www.idealista.com/inmueble/${p.id}/" target="_blank" rel="noopener">Ver anuncio en idealista ↗</a>
