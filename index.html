@@ -366,7 +366,7 @@ function fiesta(p){
       }
       const e = k - f.sube, vida = 1700; if (e > vida) continue;
       const u = e/vida, al = (u < .55 ? 1 : 1 - (u - .55)/.45) * fade;
-      const pos = (q, t) => { const fr = (1 - Math.pow(.972, t/16)) / (1 - .972); return [f.cx + q.vx*fr, f.cy + q.vy*fr + .00014*t*t]; };
+      const pos = (q, t) => { const fr = (1 - Math.pow(.972, t/16)) / (1 - .972); return [f.cx + q.vx*fr, f.cy + q.vy*fr + .00004*t*t]; };
       if (e < 260) {                   // destello de la explosión
         const g = x.createRadialGradient(f.cx, f.cy, 0, f.cx, f.cy, 30 + e*.5);
         g.addColorStop(0, "#ffffff"); g.addColorStop(.4, f.c[1]); g.addColorStop(1, "rgba(255,255,255,0)");
