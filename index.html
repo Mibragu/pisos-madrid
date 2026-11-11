@@ -67,10 +67,19 @@
   .btn.d[aria-pressed="true"]{background:var(--no);border-color:var(--no);color:#fff}
   .empty{text-align:center;color:var(--muted);padding:60px 20px}
   footer{max-width:1100px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:13px}
+  .corto{display:none}
   @media (max-width:640px){
+    .largo{display:none} .corto{display:inline}
+    header{padding:14px 12px 6px} h1{font-size:20px} header p{font-size:12px}
+    .navin{flex-wrap:nowrap;overflow-x:auto;gap:5px;padding:6px 10px;scrollbar-width:none}
+    .navin::-webkit-scrollbar{display:none}
+    .tab{flex:0 0 auto;padding:5px 9px;font-size:12px;white-space:nowrap}
+    .sort{flex:0 0 auto;font-size:0;margin-left:2px;width:auto}
+    .sort select{font-size:12px;padding:4px 4px;max-width:120px}
+    main{padding:10px 8px}
+    .head{padding:12px 12px 10px} .body{padding:12px}
     .fotos{grid-template-columns:1fr}
     .nums{text-align:left}
-    .sort{margin-left:0;width:100%}
   }
 </style>
 </head>
@@ -81,11 +90,11 @@
 </header>
 <nav>
   <div class="navin" role="tablist">
-    <button class="tab" role="tab" data-v="rev">Todos los pisos<span class="n" id="n-rev"></span></button>
-    <button class="tab" role="tab" data-v="fs">★ Favorito Sophie<span class="n" id="n-fs"></span></button>
-    <button class="tab" role="tab" data-v="fm">★ Favorito Miguel<span class="n" id="n-fm"></span></button>
-    <button class="tab sup" role="tab" data-v="sup">★★ SuperFavorito<span class="n" id="n-sup"></span></button>
-    <button class="tab" role="tab" data-v="des">✕ Descartados<span class="n" id="n-des"></span></button>
+    <button class="tab" role="tab" data-v="rev"><span class="largo">Todos los pisos</span><span class="corto">Todos</span><span class="n" id="n-rev"></span></button>
+    <button class="tab" role="tab" data-v="fs"><span class="largo">★ Favorito Sophie</span><span class="corto">★ Sophie</span><span class="n" id="n-fs"></span></button>
+    <button class="tab" role="tab" data-v="fm"><span class="largo">★ Favorito Miguel</span><span class="corto">★ Miguel</span><span class="n" id="n-fm"></span></button>
+    <button class="tab sup" role="tab" data-v="sup"><span class="largo">★★ SuperFavorito</span><span class="corto">★★ Súper</span><span class="n" id="n-sup"></span></button>
+    <button class="tab" role="tab" data-v="des"><span class="largo">✕ Descartados</span><span class="corto">✕</span><span class="n" id="n-des"></span></button>
     <label class="sort">Ordenar
       <select id="orden">
         <option value="precio">Precio (menor a mayor)</option>
