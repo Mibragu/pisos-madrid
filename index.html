@@ -339,9 +339,9 @@ function fiesta(p){
   const est = Array.from({length: 9}, (_, i) => ({t0: i*330 + Math.random()*200, x: Math.random()*W*.8, y: Math.random()*H*.35, v: 9 + Math.random()*6, l: 90 + Math.random()*90}));
   const tonos = [["#ff4f93","#f48fb1","#ffd1e1"],["#2f9bea","#7ec8f2","#d3eeff"]];
   const fuegos = Array.from({length: 10}, (_, i) => {       // fuegos artificiales rosa y azul
-    const cx = W*(.12 + Math.random()*.76), cy = H*(.14 + Math.random()*.4), t = tonos[i % 2], n = 70;
+    const cx = W*(.12 + Math.random()*.76), cy = H*(.14 + Math.random()*.4), t = tonos[i % 2], n = 96;
     return {t0: 150 + i*430 + Math.random()*150, cx, cy, sube: 380 + Math.random()*160, c: t,
-      p: Array.from({length: n}, (_, k) => { const a = k/n*6.283 + Math.random()*.2, v = (2.2 + Math.random()*3.4) * (k % 3 ? 1 : .55); return {vx: Math.cos(a)*v, vy: Math.sin(a)*v, c: t[k % 3]}; })};
+      p: Array.from({length: n}, (_, k) => { const a = k/n*6.283 + Math.random()*.2, v = (3 + Math.random()*3.5) * (k % 3 ? 1 : .55); return {vx: Math.cos(a)*v, vy: Math.sin(a)*v, c: t[k % 2]}; })};
   });
   const t0 = performance.now(), DUR = 6200;
   (function paso(t){
@@ -364,15 +364,22 @@ function fiesta(p){
         x.beginPath(); x.moveTo(f.cx, y + 26); x.lineTo(f.cx, y); x.stroke();
         continue;
       }
-      const e = k - f.sube, vida = 1500; if (e > vida) continue;
-      const u = e/vida, paso16 = e/16, al = (1 - u*u) * fade;
+      const e = k - f.sube, vida = 1700; if (e > vida) continue;
+      const u = e/vida, al = (u < .55 ? 1 : 1 - (u - .55)/.45) * fade;
+      const pos = (q, t) => { const fr = (1 - Math.pow(.972, t/16)) / (1 - .972); return [f.cx + q.vx*fr, f.cy + q.vy*fr + .00014*t*t]; };
+      if (e < 260) {                   // destello de la explosión
+        const g = x.createRadialGradient(f.cx, f.cy, 0, f.cx, f.cy, 30 + e*.5);
+        g.addColorStop(0, "#ffffff"); g.addColorStop(.4, f.c[1]); g.addColorStop(1, "rgba(255,255,255,0)");
+        x.globalAlpha = (1 - e/260) * fade; x.fillStyle = g;
+        x.beginPath(); x.arc(f.cx, f.cy, 30 + e*.5, 0, 6.283); x.fill();
+      }
+      x.lineCap = "round";
       for (const q of f.p) {
-        const fr = (1 - Math.pow(.965, paso16)) / (1 - .965);   // frenado por rozamiento
-        const px = f.cx + q.vx*fr, py = f.cy + q.vy*fr + .00016*e*e;
-        x.globalAlpha = al; x.fillStyle = q.c;
-        x.beginPath(); x.arc(px, py, 3.2*(1 - u*.5), 0, 6.283); x.fill();
-        x.globalAlpha = al*.35;
-        x.beginPath(); x.arc(px - q.vx*2.2*(1-u), py - q.vy*2.2*(1-u), 2.2, 0, 6.283); x.fill();
+        const [px, py] = pos(q, e), [ax, ay] = pos(q, Math.max(0, e - 110));
+        x.globalAlpha = al; x.strokeStyle = q.c; x.lineWidth = 4*(1 - u*.5);
+        x.beginPath(); x.moveTo(ax, ay); x.lineTo(px, py); x.stroke();
+        x.fillStyle = "#ffffff"; x.globalAlpha = al*.9;
+        x.beginPath(); x.arc(px, py, 2*(1 - u*.5), 0, 6.283); x.fill();
       }
     }
     x.globalAlpha = fade;
