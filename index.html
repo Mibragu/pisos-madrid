@@ -82,10 +82,8 @@
 </nav>
 <main id="lista"></main>
 <footer>
-  <p>Los favoritos y descartes se guardan en este navegador. Para juntar los de Sophie y los de Miguel, cada uno pulsa este botón en su dispositivo y le envía el enlace al otro.</p>
-  <p><button class="btn" id="compartir">Copiar enlace con mis marcas</button> <span id="copiado"></span></p>
-  <input id="enlace" readonly hidden aria-label="Enlace con mis marcas">
-  <p>Fotos y datos: idealista.</p>
+  <p id="sync">Conectando…</p>
+  <p>Los favoritos y descartes son compartidos: lo que marque uno lo ve el otro en unos segundos. Fotos y datos: idealista.</p>
 </footer>
 
 <script>
@@ -159,13 +157,7 @@ try { // migra las marcas de la primera versión (favorito -> favorito de Miguel
   if (viejo && !Object.keys(estado).length) for (const id in viejo) estado[id] = viejo[id]==="fav" ? {m:true} : {d:true};
 } catch(e) {}
 const IDS = new Set(PISOS.map(p => p.id));
-// marcas recibidas por enlace (#s=id,id&m=id&d=id): se suman a las de este navegador
-try {
-  const h = new URLSearchParams(location.hash.slice(1));
-  let n = 0;
-  for (const k of ["s","m","d"]) (h.get(k)||"").split(",").filter(id => IDS.has(id)).forEach(id => { (estado[id] = estado[id]||{})[k] = true; n++; });
-  if (n) history.replaceState(null, "", location.pathname);
-} catch(e) {}
+const API = "https://script.google.com/macros/s/AKfycbxcPX1hiHnYlt0JLnlI4acaVq02bgRkbMKAbmNvMRGrf1FjMa5lrr7Ww8uohhQh9sOx/exec";
 let vista = "rev";
 const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch(e) {} };
 guardar();
@@ -174,22 +166,38 @@ const src = p => p.startsWith("http") ? p : IMG + p;
 const E = id => estado[id] || {};
 const esSuper = id => !!(E(id).s && E(id).m);
 
+const aviso = t => { document.getElementById("sync").textContent = t; };
+let pendientes = 0;
+function aplicar(remoto){
+  if (!remoto || typeof remoto !== "object" || pendientes) return;
+  const nuevo = {};
+  for (const id in remoto) if (IDS.has(id)) nuevo[id] = {s:!!remoto[id].s, m:!!remoto[id].m, d:!!remoto[id].d};
+  if (JSON.stringify(nuevo) !== JSON.stringify(estado)) { estado = nuevo; guardar(); pintar(); }
+  aviso("Sincronizado con Sophie y Miguel");
+}
+function pedir(q){
+  return fetch(API + (q||""), {redirect:"follow"}).then(r => r.json());
+}
+function sincronizar(){
+  if (document.hidden) return;
+  pedir().then(aplicar).catch(() => aviso("Sin conexión: se muestran las últimas marcas guardadas en este dispositivo"));
+}
+function enviar(id, k, v){
+  pendientes++;
+  return pedir("?id="+id+"&k="+k+"&v="+(v?1:0))
+    .then(r => { pendientes--; aplicar(r); })
+    .catch(() => { pendientes--; aviso("No se ha podido guardar la última marca; revisa la conexión y vuelve a pulsar"); });
+}
+
 function marcar(id, k){
   const e = estado[id] = estado[id] || {};
   e[k] = !e[k];
   if (k === "d" && e.d) { e.s = false; e.m = false; }
   if (k !== "d" && e[k]) e.d = false;
+  const v = e[k];
   if (!e.s && !e.m && !e.d) delete estado[id];
   guardar(); pintar();
-}
-
-function enlace(){
-  const q = ["s","m","d"].map(k => { const ids = PISOS.filter(p => E(p.id)[k]).map(p => p.id); return ids.length ? k+"="+ids.join(",") : ""; }).filter(Boolean).join("&");
-  const url = location.origin + location.pathname + (q ? "#"+q : "");
-  const out = document.getElementById("enlace");
-  out.value = url; out.hidden = false; out.select();
-  const ok = () => { document.getElementById("copiado").textContent = "Enlace copiado: envíalo por WhatsApp y al abrirlo se sumarán tus marcas."; };
-  if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, () => {}); 
+  enviar(id, k, v);
 }
 
 function tarjeta(p){
@@ -240,8 +248,19 @@ function pintar(){
 
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => { vista = t.dataset.v; pintar(); window.scrollTo(0,0); });
 document.getElementById("orden").onchange = pintar;
-document.getElementById("compartir").onclick = enlace;
 pintar();
+// primera carga: sube las marcas que ya hubiera en este dispositivo y luego se sincroniza cada pocos segundos
+(async () => {
+  const locales = [];
+  for (const id in estado) for (const k of ["s","m","d"]) if (estado[id][k]) locales.push([id,k]);
+  if (locales.length && !localStorage.getItem(KEY+"-subido")) {
+    for (const [id,k] of locales) await enviar(id, k, true);
+    try { localStorage.setItem(KEY+"-subido", "1"); } catch(e) {}
+  }
+  sincronizar();
+  setInterval(sincronizar, 6000);
+  document.addEventListener("visibilitychange", sincronizar);
+})();
 </script>
 </body>
 </html>
