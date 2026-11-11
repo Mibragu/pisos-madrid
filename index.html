@@ -24,7 +24,14 @@
   select{font:inherit;font-size:14px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff}
   main{max-width:1100px;margin:0 auto;padding:20px}
   .card{background:var(--card);border:2px solid #111;border-radius:14px;margin-bottom:26px;overflow:hidden}
-  .card.sup{box-shadow:0 0 0 4px var(--fav)}
+  .card.sup{box-shadow:0 0 0 4px var(--rosa), 0 0 0 8px var(--azul), 0 10px 30px rgba(126,200,242,.45)}
+  .banda{position:relative;overflow:hidden;text-align:center;padding:9px 12px;font-weight:800;font-size:15px;letter-spacing:.04em;color:#111;border-bottom:2px solid #111;
+    background:linear-gradient(90deg,var(--rosa),var(--azul),var(--rosa),var(--azul),var(--rosa));background-size:300% 100%;animation:banda 6s linear infinite}
+  .banda span{position:relative;z-index:1}
+  .banda::after{content:"";position:absolute;top:0;bottom:0;width:35%;left:-40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);animation:brillo 2.6s ease-in-out infinite}
+  @keyframes banda{to{background-position:300% 0}}
+  @keyframes brillo{to{left:110%}}
+  @media (prefers-reduced-motion:reduce){.banda,.banda::after{animation:none}}
   .badge.sup{background:var(--fav);color:#fff}
   .tab.sup[aria-selected="true"]{background:var(--fav);border-color:var(--fav)}
   #enlace{width:100%;font:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px}
@@ -98,6 +105,7 @@
     <label class="sort">Ordenar
       <select id="orden">
         <option value="precio">Precio (menor a mayor)</option>
+        <option value="nuevo">Últimos añadidos</option>
         <option value="m2">Superficie (mayor a menor)</option>
         <option value="em2">€/m² (menor a mayor)</option>
       </select>
@@ -274,6 +282,7 @@ function tarjeta(p){
   const e = E(p.id), sup = esSuper(p.id);
   const foto = (k, t) => `<figure><img loading="lazy" referrerpolicy="no-referrer" src="${src(p.fotos[k])}" alt="${t} · ${p.titulo}"><figcaption>${t}</figcaption></figure>`;
   return `<article class="card ${sup?"sup":""}">
+    ${sup?'<div class="banda"><span>★★ SuperFavorito de Sophie y Miguel ★★</span></div>':""}
     <div class="head">
       <div>
         <h2>${p.titulo}<span class="badge ${p.origen==="S"?"s":""}">${p.origen==="S"?"De Sophie":"De Miguel"}</span>${e.s?'<span class="check s">✓ Sophie</span>':""}${e.m?'<span class="check m">✓ Miguel</span>':""}${sup?'<span class="badge sup">★★ SuperFavorito</span>':""}</h2>
@@ -358,7 +367,7 @@ function pintar(){
   Object.keys(FILTRO).forEach(v => document.getElementById("n-"+v).textContent = de(v).length);
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.v===vista));
   const o = document.getElementById("orden").value;
-  const lista = de(vista).sort((a,b) => o==="precio" ? a.precio-b.precio : o==="m2" ? b.m2-a.m2 : a.precio/a.m2 - b.precio/b.m2);
+  const lista = de(vista).sort((a,b) => o==="nuevo" ? PISOS.indexOf(b)-PISOS.indexOf(a) : o==="precio" ? a.precio-b.precio : o==="m2" ? b.m2-a.m2 : a.precio/a.m2 - b.precio/b.m2);
   const vacio = {rev:"No queda ninguna vivienda: están todas descartadas.", fs:"Sophie todavía no ha marcado ningún favorito.", fm:"Miguel todavía no ha marcado ningún favorito.", sup:"Todavía no hay ningún piso que sea favorito de los dos.", des:"No hay ninguna vivienda descartada."};
   document.getElementById("lista").innerHTML = lista.length ? lista.map(tarjeta).join("") : `<p class="empty">${vacio[vista]}</p>`;
 }
