@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pisos Madrid · repaso</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#fff; --ink:#1d1d1b; --muted:#6b6a65; --line:#e4e0d6;
+    --accent:#1f4d3a; --fav:#c98a00; --no:#a33a2c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{max-width:1100px;margin:0 auto;padding:28px 20px 8px}
+  h1{margin:0 0 4px;font-size:26px;letter-spacing:-.01em}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+  .navin{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tab{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 16px;border-radius:999px;font:inherit;font-weight:600;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tab .n{opacity:.7;font-weight:500;margin-left:4px}
+  .sort{margin-left:auto;font-size:14px;color:var(--muted)}
+  select{font:inherit;font-size:14px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+  main{max-width:1100px;margin:0 auto;padding:20px}
+  .card{background:var(--card);border:2px solid #111;border-radius:14px;margin-bottom:26px;overflow:hidden}
+  .card.fav{box-shadow:0 0 0 4px rgba(201,138,0,.55)}
+  .head{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;padding:18px 20px 12px;flex-wrap:wrap}
+  .head h2{margin:0;font-size:19px}
+  .zona{color:var(--muted);font-size:14px}
+  .badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:#eef3f0;color:var(--accent);margin-left:6px;vertical-align:middle}
+  .badge.s{background:#f6ecf5;color:#7a2f74}
+  .nums{display:flex;gap:22px;text-align:right}
+  .num b{display:block;font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}
+  .num span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#111;border-top:2px solid #111;border-bottom:2px solid #111}
+  figure{margin:0;position:relative;background:#ddd;aspect-ratio:4/3}
+  figure img{width:100%;height:100%;object-fit:cover;display:block}
+  figcaption{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.62);color:#fff;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
+  .body{padding:14px 20px 18px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:0;list-style:none}
+  .chips li{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:#3c3b37}
+  .nota{font-size:14px;background:#faf3f9;border-left:3px solid #7a2f74;padding:8px 12px;border-radius:0 8px 8px 0;margin:0 0 12px}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{font:inherit;font-weight:600;font-size:14px;border-radius:9px;padding:9px 14px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none}
+  .btn.link{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.f[aria-pressed="true"]{background:var(--fav);border-color:var(--fav);color:#fff}
+  .btn.d[aria-pressed="true"]{background:var(--no);border-color:var(--no);color:#fff}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px}
+  footer{max-width:1100px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:13px}
+  @media (max-width:640px){
+    .fotos{grid-template-columns:1fr}
+    .nums{text-align:left}
+    .sort{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pisos en alquiler · Madrid</h1>
+  <p>Repaso de viviendas de idealista. Datos recogidos el 11 de noviembre de 2026; comprueba el anuncio antes de decidir.</p>
+</header>
+<nav>
+  <div class="navin" role="tablist">
+    <button class="tab" role="tab" data-v="rev">Por revisar<span class="n" id="n-rev"></span></button>
+    <button class="tab" role="tab" data-v="fav">★ Favoritos<span class="n" id="n-fav"></span></button>
+    <button class="tab" role="tab" data-v="des">✕ Descartados<span class="n" id="n-des"></span></button>
+    <label class="sort">Ordenar
+      <select id="orden">
+        <option value="precio">Precio (menor a mayor)</option>
+        <option value="m2">Superficie (mayor a menor)</option>
+        <option value="em2">€/m² (menor a mayor)</option>
+      </select>
+    </label>
+  </div>
+</nav>
+<main id="lista"></main>
+<footer>Los favoritos y descartes se guardan en este navegador. Fotos y datos: idealista.</footer>
+
+<script>
+const IMG = "https://img4.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/";
+// origen: "S" = enviado por Sophie, "M" = pestaña abierta por Miguel
+const PISOS = [
+  {id:"112837717", origen:"S", titulo:"Ático en Calle de Jorge Juan", zona:"Fuente del Berro", precio:2600, m2:103, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"9f/66/2e/1483835710.jpg", cocina:"ce/3b/d1/1483835713.jpg", dorm:"57/38/d9/1483835775.jpg"},
+   det:["98 m² útiles","2 baños","Terraza","Amueblado","Calefacción central","Aire acondicionado"],
+   nota:"«Este es ideal pero más caro»"},
+  {id:"112900033", origen:"S", titulo:"Piso en Calle de Goya", zona:"Goya", precio:2300, m2:84, hab:3, planta:"5ª exterior, ascensor",
+   fotos:{salon:"9b/3a/b4/1486002731.jpg", cocina:"b8/9e/ea/1486002748.jpg", dorm:"27/ee/19/1486002687.jpg"},
+   det:["78 m² útiles","1 baño","Balcón","Orientación sur","Sin amueblar","Calefacción central"],
+   nota:"«Este no está mal»"},
+  {id:"30181843", origen:"S", titulo:"Piso en Calle Jorge Juan, 77", zona:"Goya", precio:2300, m2:110, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"62/9c/58/1478509108.jpg", cocina:"1d/ea/3d/1478509146.jpg", dorm:"7f/21/2c/1478509124.jpg"},
+   salonEtiqueta:"Foto principal",
+   det:["1 baño","Balcón","Sin amueblar","Calefacción individual","Aire acondicionado"],
+   nota:"Misma dirección que el otro de Jorge Juan, 77: «se ve que han renovado todo el edificio»"},
+  {id:"1072388", origen:"S", titulo:"Piso en Calle Jorge Juan, 77", zona:"Goya", precio:2400, m2:110, hab:2, planta:"1ª exterior, ascensor",
+   fotos:{salon:"ca/cf/09/1428788324.jpg", cocina:"5c/0c/7b/1428788309.jpg", dorm:"d9/3f/7e/1428788301.jpg"},
+   det:["2 baños","Sin amueblar","Calefacción individual","Aire acondicionado"],
+   nota:"«Este me gusta también»… y después: «las habitaciones, regular»"},
+  {id:"112417150", origen:"S", titulo:"Piso en Calle de Hermosilla", zona:"Goya", precio:2200, m2:77, hab:2, planta:"5ª exterior",
+   fotos:{salon:"ae/5c/ef/1469717688.jpg", cocina:"eb/02/36/1469717689.jpg", dorm:"d9/6d/d5/1469717700.jpg"},
+   det:["72 m² útiles","2 baños","Balcón","Orientación oeste","Sin amueblar","Bomba de frío/calor"]},
+  {id:"110237391", origen:"S", titulo:"Piso en Calle del General Pardiñas, 48", zona:"Goya", precio:2000, m2:50, hab:2, planta:"Bajo interior, ascensor",
+   fotos:{salon:"https://img4.idealista.com/blur/WEB_DETAIL/90/id.pro.es.image.master/97/a0/a5/1437722294.jpg", cocina:"9d/cf/e7/1437424788.jpg", dorm:"a0/ee/a5/1437422616.jpg"},
+   det:["1 baño","Terraza","Orientación norte","Amueblado","Calefacción eléctrica"],
+   nota:"Lo mandó como ejemplo de precio disparatado: «bajo interior de 50 m²… 2.000 euros»"}  ,
+  {id:"112532232", origen:"M", titulo:"Piso en Calle del Marqués de Mondéjar", zona:"Fuente del Berro", precio:1900, m2:100, hab:2, planta:"3ª interior, ascensor",
+   fotos:{salon:"74/19/d3/1473663489.jpg", cocina:"12/7c/16/1473663473.jpg", dorm:"7a/e1/76/1473663531.jpg"},
+   det:["2 baños","Amueblado","Armarios empotrados","Aire acondicionado"]},
+  {id:"112832221", origen:"M", titulo:"Piso en Fuente del Berro", zona:"Barrio de Salamanca", precio:1950, m2:90, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"9b/81/e4/1483650589.jpg", cocina:"2e/31/bc/1483650530.jpg", dorm:"10/b2/d0/1483650563.jpg"},
+   det:["2 baños","Orientación sur","Sin amueblar","Calefacción individual","Aire acondicionado"]},
+  {id:"111924115", origen:"M", titulo:"Piso en Calle de Hermosilla", zona:"Goya", precio:2200, m2:93, hab:3, planta:"2ª exterior, ascensor",
+   fotos:{salon:"41/b1/03/1481459331.jpg", cocina:"97/11/a8/1481459302.jpg", dorm:"fa/f4/a7/1481459381.jpg"},
+   det:["87 m² útiles","2 baños","Balcón","Orientación norte y oeste","Amueblado"]},
+  {id:"112699188", origen:"M", titulo:"Piso en Calle de la Fuente del Berro", zona:"Goya", precio:2300, m2:117, hab:3, planta:"2ª exterior, ascensor",
+   fotos:{salon:"d2/55/da/1479069469.jpg", cocina:"63/82/9c/1479069444.jpg", dorm:"26/80/af/1479069450.jpg"},
+   dormEtiqueta:"Estancia",
+   det:["2 baños","Sin amueblar","Armarios empotrados","Calefacción central"]},
+  {id:"112919990", origen:"M", titulo:"Piso en Calle de Castelló", zona:"Recoletos", precio:2500, m2:82, hab:2, planta:"6ª exterior, ascensor",
+   fotos:{salon:"fe/23/3c/1488495372.jpg", cocina:"7e/29/67/1488495368.jpg", dorm:"b7/ab/4a/1488495375.jpg"},
+   det:["70 m² útiles","2 baños","Garaje incluido","Orientación oeste","Sin amueblar","Calefacción individual"]},
+  {id:"112752242", origen:"M", titulo:"Piso en Fuente del Berro", zona:"Barrio de Salamanca", precio:2550, m2:102, hab:3, planta:"4ª exterior, ascensor",
+   fotos:{salon:"20/f2/56/1480909617.jpg", cocina:"f8/52/f6/1480909615.jpg", dorm:"c7/1e/1c/1480909645.jpg"},
+   salonEtiqueta:"Estancia",
+   det:["2 baños","Trastero","Sin amueblar","Calefacción central","Aire acondicionado"]},
+  {id:"112708661", origen:"M", titulo:"Piso en Calle del Príncipe de Vergara", zona:"Castellana", precio:2600, m2:140, hab:4, planta:"3ª exterior, ascensor",
+   fotos:{salon:"9f/be/26/1483779485.jpg", cocina:"e3/5a/96/1483779505.jpg", dorm:"14/80/31/1483779488.jpg"},
+   det:["129 m² útiles","2 baños","Amueblado","Armarios empotrados","Calefacción central"]},
+  {id:"112877321", origen:"M", titulo:"Piso en Calle de Fernán González, 54", zona:"Ibiza", precio:2600, m2:117, hab:2, planta:"2ª exterior, ascensor",
+   fotos:{salon:"19/65/db/1485193324.jpg", cocina:"6c/06/03/1485193528.jpg", dorm:"46/d0/af/1485193494.jpg"},
+   det:["105 m² útiles","2 baños","Terraza","Orientación este","Amueblado","Aire acondicionado"]},
+  {id:"112528205", origen:"M", titulo:"Ático en Calle de Cartagena", zona:"Prosperidad", precio:2650, m2:106, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"7a/de/93/1486745597.jpg", cocina:"40/94/88/1486745576.jpg", dorm:"7e/23/ce/1486745601.jpg"},
+   det:["2 baños","Terraza","Garaje incluido","Orientación sur y oeste","Sin amueblar","Calefacción central"]},
+  {id:"112394498", origen:"M", titulo:"Piso en Calle de Juan Esplandiú", zona:"Estrella", precio:2700, m2:161, hab:3, planta:"14ª exterior, ascensor",
+   fotos:{salon:"38/df/ae/1468559946.jpg", cocina:"17/14/c7/1468559965.jpg", dorm:"36/20/2c/1468559975.jpg"},
+   det:["136 m² útiles","3 baños","Garaje incluido","Sin amueblar","Calefacción individual"]}
+];
+
+const KEY = "pisos-madrid-estado";
+let estado = {};
+try { estado = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { estado = {}; }
+let vista = "rev";
+const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch(e) {} };
+const eur = n => n.toLocaleString("es-ES");
+const src = p => p.startsWith("http") ? p : IMG + p;
+
+function marcar(id, v){
+  if (estado[id] === v) delete estado[id]; else estado[id] = v;
+  guardar(); pintar();
+}
+
+function tarjeta(p){
+  const e = estado[p.id];
+  const foto = (k, t) => `<figure><img loading="lazy" referrerpolicy="no-referrer" src="${src(p.fotos[k])}" alt="${t} · ${p.titulo}"><figcaption>${t}</figcaption></figure>`;
+  return `<article class="card ${e==="fav"?"fav":""}">
+    <div class="head">
+      <div>
+        <h2>${p.titulo}<span class="badge ${p.origen==="S"?"s":""}">${p.origen==="S"?"De Sophie":"De Miguel"}</span></h2>
+        <div class="zona">${p.zona}, Madrid · ${p.hab} hab. · ${p.planta}</div>
+      </div>
+      <div class="nums">
+        <div class="num"><b>${eur(p.precio)} €</b><span>al mes</span></div>
+        <div class="num"><b>${p.m2} m²</b><span>construidos</span></div>
+        <div class="num"><b>${(p.precio/p.m2).toFixed(1).replace(".",",")}</b><span>€/m²</span></div>
+      </div>
+    </div>
+    <div class="fotos">${foto("salon", p.salonEtiqueta||"Salón")}${foto("cocina","Cocina")}${foto("dorm", p.dormEtiqueta||"Dormitorio")}</div>
+    <div class="body">
+      ${p.nota?`<p class="nota"><strong>Sophie:</strong> ${p.nota}</p>`:""}
+      <ul class="chips">${p.det.map(d=>`<li>${d}</li>`).join("")}</ul>
+      <div class="acts">
+        <a class="btn link" href="https://www.idealista.com/inmueble/${p.id}/" target="_blank" rel="noopener">Ver anuncio en idealista ↗</a>
+        <button class="btn f" aria-pressed="${e==="fav"}" onclick="marcar('${p.id}','fav')">★ ${e==="fav"?"Favorito":"Añadir a favoritos"}</button>
+        <button class="btn d" aria-pressed="${e==="des"}" onclick="marcar('${p.id}','des')">✕ ${e==="des"?"Descartado":"Descartar"}</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+function pintar(){
+  const de = v => PISOS.filter(p => v==="rev" ? !estado[p.id] : estado[p.id]===v);
+  ["rev","fav","des"].forEach(v => document.getElementById("n-"+v).textContent = de(v).length);
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.v===vista));
+  const o = document.getElementById("orden").value;
+  const lista = de(vista).sort((a,b) => o==="precio" ? a.precio-b.precio : o==="m2" ? b.m2-a.m2 : a.precio/a.m2 - b.precio/b.m2);
+  const vacio = {rev:"No queda ninguna vivienda por revisar.", fav:"Todavía no has marcado ningún favorito.", des:"No has descartado ninguna vivienda."};
+  document.getElementById("lista").innerHTML = lista.length ? lista.map(tarjeta).join("") : `<p class="empty">${vacio[vista]}</p>`;
+}
+
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => { vista = t.dataset.v; pintar(); window.scrollTo(0,0); });
+document.getElementById("orden").onchange = pintar;
+pintar();
+</script>
+</body>
+</html>
