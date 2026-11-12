@@ -57,6 +57,10 @@
   .cond dt{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
   .cond dd{margin:2px 0 0;font-size:14px;font-weight:600}
   @media (max-width:640px){.cond{grid-template-columns:1fr}.cond div{border-left:0;border-top:1px solid #111}.cond div:first-child{border-top:0}}
+  .aviso{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:10px 16px;font-size:15px;border-bottom:2px solid #111;background:#ffe45c;color:#111}
+  .aviso.baja{background:#35d07f} .aviso.sube{background:#ff7a6b} .aviso.retirado{background:#111;color:#fff}
+  .aviso b{font-weight:800} .aviso span{font-size:12px;font-weight:600;opacity:.8}
+  .num s{display:block;font-size:13px;color:var(--no);font-weight:600}
   .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .btn{font:inherit;font-weight:600;font-size:14px;border-radius:9px;padding:9px 14px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none}
   .btn.link{background:#111;border-color:#111;color:#fff}
@@ -93,7 +97,7 @@
 <body>
 <header>
   <h1>Pisos en alquiler · Madrid</h1>
-  <p>Repaso de viviendas de idealista. Datos recogidos el 11 de noviembre de 2026; comprueba el anuncio antes de decidir.</p>
+  <p>Repaso de viviendas de idealista. Última revisión de precios y condiciones: <span id="rev"></span>. Los cambios se avisan con una banda de color en el anuncio.</p>
 </header>
 <nav>
   <div class="navin" role="tablist">
@@ -199,10 +203,11 @@ const PISOS = [
   {id:"109674166", origen:"M", titulo:"Piso en Calle de la Cruz del Sur", zona:"Estrella", precio:2200, m2:117, hab:3, planta:"5ª exterior, ascensor",
    fotos:{salon:"40/a6/1b/1481633653.jpg", cocina:"a1/e7/0b/1481633677.jpg", dorm:"89/c9/58/1481633697.jpg"},
    det:["2 baños","Amueblado","Armarios empotrados","Calefacción individual","Aire acondicionado"]},
-  {id:"110469572", origen:"M", titulo:"Piso en Calle de los Peñascales", zona:"Fuente del Berro", precio:2145, m2:110, hab:3, planta:"5ª exterior, ascensor",
+  {id:"110469572", origen:"M", titulo:"Piso en Calle de los Peñascales", zona:"Fuente del Berro", precio:1875, precioAnterior:1975,
+   cambios:[{fecha:"12 nov. 2026", tipo:"baja", texto:"Baja de precio: 1.975 € → 1.875 € (−5 %)"}], m2:110, hab:3, planta:"5ª exterior, ascensor",
    fotos:{salon:"cf/2b/94/1452935691.jpg"},
    salonEtiqueta:"Foto principal",
-   det:["2 baños","2 balcones","Sin amueblar","Cocina americana equipada","Calefacción central","Aire acondicionado","Comunidad incluida","Conserje"]}
+   det:["2 baños","2 balcones","Sin amueblar","Cocina americana equipada","Calefacción central","Aire acondicionado","Conserje"]}
 ];
 
 // Condiciones leídas en cada anuncio (11 nov. 2026). Lo que el anuncio no indica queda "sin especificar".
@@ -220,6 +225,7 @@ const COND = {
 const MESES = {"1 mes": 1};
 
 
+const REVISADO = "11 nov. 2026 (Peñascales, 12 nov.)";
 const KEY = "pisos-madrid-estado-v2";
 // estado[id] = {s: favorito de Sophie, m: favorito de Miguel, d: descartado}
 let estado = {};
@@ -272,6 +278,12 @@ function marcar(id, k){
   enviar(id, k, v);
 }
 
+// Avisos de cambios detectados al revisar el anuncio: tipo "baja", "sube", "cond" (condiciones) o "retirado"
+function avisos(p){
+  const ICONO = {baja:"▼", sube:"▲", cond:"●", retirado:"✕"};
+  return (p.cambios||[]).map(c => `<div class="aviso ${c.tipo}"><b>${ICONO[c.tipo]||"●"} ${c.texto}</b><span>Detectado el ${c.fecha}</span></div>`).join("");
+}
+
 function condiciones(p){
   const c = COND[p.id] || [];
   const fianza = c[0] ? `${c[0]} (${eur(p.precio * MESES[c[0]])} €)` : "sin especificar";
@@ -286,6 +298,7 @@ function tarjeta(p){
   const e = E(p.id), sup = esSuper(p.id);
   const foto = (k, t) => !p.fotos[k] ? "" : `<figure><img loading="lazy" referrerpolicy="no-referrer" src="${src(p.fotos[k])}" alt="${t} · ${p.titulo}"><figcaption>${t}</figcaption></figure>`;
   return `<article class="card ${sup?"sup":""}">
+    ${avisos(p)}
     ${sup?'<div class="banda"><span>★★ SuperFavorito de Sophie y Miguel ★★</span></div>':""}
     <div class="head">
       <div>
@@ -293,7 +306,7 @@ function tarjeta(p){
         <div class="zona">${p.zona}, Madrid · ${p.hab} hab. · ${p.planta}</div>
       </div>
       <div class="nums">
-        <div class="num"><b>${eur(p.precio)} €</b><span>al mes</span></div>
+        <div class="num"><b>${eur(p.precio)} €</b>${p.precioAnterior?`<s>${eur(p.precioAnterior)} €</s>`:""}<span>al mes</span></div>
         <div class="num"><b>${p.m2} m²</b><span>construidos</span></div>
         <div class="num"><b>${(p.precio/p.m2).toFixed(1).replace(".",",")}</b><span>€/m²</span></div>
       </div>
@@ -410,6 +423,7 @@ function pintar(){
 
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => { vista = t.dataset.v; pintar(); window.scrollTo(0,0); });
 document.getElementById("orden").onchange = pintar;
+document.getElementById("rev").textContent = REVISADO;
 pintar();
 // primera carga: sube las marcas que ya hubiera en este dispositivo y luego se sincroniza cada pocos segundos
 (async () => {
