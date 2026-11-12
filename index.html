@@ -198,7 +198,11 @@ const PISOS = [
    det:["107 m² útiles","3 baños","Orientación sur","Sin amueblar","Calefacción individual"]},
   {id:"109674166", origen:"M", titulo:"Piso en Calle de la Cruz del Sur", zona:"Estrella", precio:2200, m2:117, hab:3, planta:"5ª exterior, ascensor",
    fotos:{salon:"40/a6/1b/1481633653.jpg", cocina:"a1/e7/0b/1481633677.jpg", dorm:"89/c9/58/1481633697.jpg"},
-   det:["2 baños","Amueblado","Armarios empotrados","Calefacción individual","Aire acondicionado"]}
+   det:["2 baños","Amueblado","Armarios empotrados","Calefacción individual","Aire acondicionado"]},
+  {id:"110469572", origen:"M", titulo:"Piso en Calle de los Peñascales", zona:"Fuente del Berro", precio:2145, m2:110, hab:3, planta:"5ª exterior, ascensor",
+   fotos:{salon:"cf/2b/94/1452935691.jpg"},
+   salonEtiqueta:"Foto principal",
+   det:["2 baños","2 balcones","Sin amueblar","Cocina americana equipada","Calefacción central","Aire acondicionado","Comunidad incluida","Conserje"]}
 ];
 
 // Condiciones leídas en cada anuncio (11 nov. 2026). Lo que el anuncio no indica queda "sin especificar".
@@ -280,7 +284,7 @@ function condiciones(p){
 
 function tarjeta(p){
   const e = E(p.id), sup = esSuper(p.id);
-  const foto = (k, t) => `<figure><img loading="lazy" referrerpolicy="no-referrer" src="${src(p.fotos[k])}" alt="${t} · ${p.titulo}"><figcaption>${t}</figcaption></figure>`;
+  const foto = (k, t) => !p.fotos[k] ? "" : `<figure><img loading="lazy" referrerpolicy="no-referrer" src="${src(p.fotos[k])}" alt="${t} · ${p.titulo}"><figcaption>${t}</figcaption></figure>`;
   return `<article class="card ${sup?"sup":""}">
     ${sup?'<div class="banda"><span>★★ SuperFavorito de Sophie y Miguel ★★</span></div>':""}
     <div class="head">
