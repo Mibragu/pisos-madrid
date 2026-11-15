@@ -58,6 +58,7 @@
   .cond dd{margin:2px 0 0;font-size:14px;font-weight:600}
   @media (max-width:640px){.cond{grid-template-columns:1fr}.cond div{border-left:0;border-top:1px solid #111}.cond div:first-child{border-top:0}}
   .aviso{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:10px 16px;font-size:15px;border-bottom:2px solid #111;background:#ffe45c;color:#111}
+  .aviso.pend{background:#ecebe6;font-size:13px;padding:6px 16px} .aviso.pend b{font-weight:600}
   .aviso.baja{background:#35d07f} .aviso.sube{background:#ff7a6b} .aviso.retirado{background:#111;color:#fff}
   .aviso b{font-weight:800} .aviso span{font-size:12px;font-weight:600;opacity:.8}
   .num s{display:block;font-size:13px;color:var(--no);font-weight:600}
@@ -207,7 +208,71 @@ const PISOS = [
    cambios:[{fecha:"12 nov. 2026", tipo:"baja", texto:"Baja de precio: 1.975 € → 1.875 € (−5 %)"}], m2:110, hab:3, planta:"5ª exterior, ascensor",
    fotos:{salon:"cf/2b/94/1452935691.jpg"},
    salonEtiqueta:"Foto principal",
-   det:["2 baños","2 balcones","Sin amueblar","Cocina americana equipada","Calefacción central","Aire acondicionado","Conserje"]}
+   det:["2 baños","2 balcones","Sin amueblar","Cocina americana equipada","Calefacción central","Aire acondicionado","Conserje"]},
+  {id:"89791904", origen:"M", titulo:"Piso en Calle de Méjico", zona:"Guindalera", precio:2200, m2:95, hab:3, planta:"1ª exterior, ascensor",
+   fotos:{salon:"32/9c/ed/1491861663.jpg"}, salonEtiqueta:"Terraza",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Terraza y balcón", "Sin amueblar", "Calefacción central", "Aire acondicionado"]},
+  {id:"113069666", origen:"M", titulo:"Piso en Calle Alamedilla", zona:"Delicias", precio:2090, m2:133, hab:2, planta:"3ª exterior, ascensor",
+   fotos:{salon:"04/34/de/1491939240.jpg"}, salonEtiqueta:"Dormitorio",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Terraza", "Garaje", "Trastero", "Sin amueblar", "Aire acondicionado"]},
+  {id:"113061025", origen:"M", titulo:"Piso en Calle de los Peñascales, 68", zona:"Fuente del Berro", precio:2190, m2:100, hab:3, planta:"4ª exterior, ascensor",
+   fotos:{salon:"c1/e6/c5/1491603404.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["80 m² útiles", "2 baños", "Amueblado", "Garaje opcional 110 €/mes", "Orientación norte", "Calefacción individual", "Aire acondicionado"]},
+  {id:"113039855", origen:"M", titulo:"Piso en Calle de la Fuente del Berro", zona:"Goya", precio:2400, m2:105, hab:4, planta:"6ª interior, ascensor",
+   fotos:{salon:"08/a5/8f/1490883892.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Sin amueblar", "Calefacción central", "Aire acondicionado"]},
+  {id:"113032206", origen:"M", titulo:"Piso en Calle del Doctor Esquerdo, 124", zona:"Niño Jesús", precio:1900, precioAnterior:2100, m2:75, hab:2, planta:"3ª exterior, ascensor",
+   fotos:{salon:"d5/4e/d7/1490582899.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Balcón", "Amueblado", "Calefacción central", "Aire acondicionado"]},
+  {id:"112929079", origen:"M", titulo:"Piso en Avenida del Mediterráneo, 59", zona:"Estrella", precio:2100, m2:104, hab:3, planta:"3ª exterior, ascensor",
+   fotos:{salon:"62/16/b1/1490083248.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Balcón", "Garaje (opcional 120 €/mes o incluido: confirmar)", "Calefacción individual", "Aire acondicionado"]},
+  {id:"112998093", origen:"M", titulo:"Piso en Avenida de la Ciudad de Barcelona, 192", zona:"Adelfas", precio:2280, m2:110, hab:4, planta:"4ª exterior, ascensor",
+   fotos:{salon:"3a/a3/a0/1489373206.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["105 m² útiles", "2 baños", "Garaje incluido", "Sin amueblar", "Calefacción individual", "Aire acondicionado"]},
+  {id:"109169901", origen:"M", titulo:"Piso en Avenida de Nazaret, 13", zona:"Niño Jesús", precio:2395, m2:100, hab:2, planta:"3ª exterior, ascensor",
+   fotos:{salon:"a2/5c/0b/1366338275.jpg"}, salonEtiqueta:"Piscina",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Amueblado", "Trastero", "Garaje opcional 150 €/mes", "Piscina y jardín comunitarios", "Aire acondicionado"]},
+  {id:"112935495", origen:"M", titulo:"Piso en Calle de Játiva", zona:"Adelfas", precio:2250, m2:120, hab:3, planta:"6ª exterior, ascensor",
+   fotos:{salon:"39/3a/6a/1487209835.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["100 m² útiles", "2 baños", "Balcón", "Garaje", "Amueblado", "Calefacción individual", "Aire acondicionado"]},
+  {id:"112924702", origen:"M", titulo:"Piso en Calle de Nuestra Señora de Guadalupe", zona:"Guindalera", precio:2000, m2:108, hab:2, planta:"3ª exterior, ascensor",
+   fotos:{salon:"2f/62/83/1486833263.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["94 m² útiles", "2 baños", "2 balcones", "Sin amueblar", "Calefacción individual"]},
+  {id:"112914837", origen:"M", titulo:"Piso en Bocángel", zona:"Fuente del Berro", precio:2400, m2:111, hab:4, planta:"3ª exterior, ascensor",
+   fotos:{salon:"20/56/0e/1486945919.jpg"}, salonEtiqueta:"Vistas",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["102 m² útiles", "2 baños", "Terraza", "Amueblado", "Calefacción individual", "Aire acondicionado"]},
+  {id:"112896636", origen:"M", titulo:"Ático en Guindalera", zona:"Guindalera", precio:2300, m2:86, hab:2, planta:"4ª exterior, ascensor",
+   fotos:{salon:"92/de/46/1485881603.jpg"}, salonEtiqueta:"Terraza",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["76 m² útiles", "2 baños", "Terraza de 20 m²", "Trastero", "Amueblado", "Calefacción individual", "Aire acondicionado"]},
+  {id:"108455539", origen:"M", titulo:"Piso en Calle de Núñez de Balboa, 31", zona:"Recoletos", precio:2300, m2:90, hab:2, planta:"4ª exterior, ascensor",
+   fotos:{salon:"59/7c/7a/1486098578.jpg"}, salonEtiqueta:"Vistas",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Amueblado o sin amueblar", "Orientación oeste", "Calefacción central", "Aire acondicionado"]},
+  {id:"104735066", origen:"M", titulo:"Piso en Calle de Félix Rodríguez de la Fuente", zona:"Media Legua", precio:1550, m2:100, hab:3, planta:"7ª exterior, ascensor",
+   fotos:{salon:"5a/2d/4d/1230037136.jpg"}, salonEtiqueta:"Salón",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["85 m² útiles", "2 baños", "Terraza", "Garaje incluido", "Sin amueblar", "Calefacción individual", "Aire acondicionado"]},
+  {id:"112630158", origen:"M", titulo:"Piso en Calle del Comercio", zona:"Pacífico", precio:1750, m2:100, hab:3, planta:"2ª exterior, ascensor",
+   fotos:{salon:"5f/a8/39/1476489393.jpg"}, salonEtiqueta:"Cocina",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["2 baños", "Terraza", "Sin amueblar", "Calefacción central"]},
+  {id:"108267836", origen:"M", titulo:"Piso en Calle Fuenterrabía", zona:"Pacífico", precio:2300, m2:145, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"5a/43/8c/1339035062.jpg"}, salonEtiqueta:"Estancia",
+   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   det:["130 m² útiles", "2 baños", "Terraza", "Sin amueblar", "Calefacción central", "Aire acondicionado"]}
 ];
 
 // Condiciones leídas en cada anuncio (11 nov. 2026). Lo que el anuncio no indica queda "sin especificar".
@@ -222,10 +287,28 @@ const COND = {
   "1951799": ["1 mes"], "109674166": ["1 mes"], "110237391": ["1 mes"], "112532232": ["1 mes"], "112708661": ["1 mes"], "112832221": ["1 mes"],
   "112837717": ["1 mes"], "112877321": ["1 mes"], "112900033": ["1 mes"], "112919990": ["1 mes"], "113018974": ["1 mes"]
 };
-const MESES = {"1 mes": 1};
+const MESES = {"1 mes": 1, "2 meses": 2};
+Object.assign(COND, {
+  "89791904": ["1 mes", null, null],
+  "113069666": [null, null, "12 meses o más (larga estancia)"],
+  "113061025": ["1 mes", null, null],
+  "113039855": ["1 mes", null, null],
+  "113032206": ["1 mes", "1 mes de garantía adicional; solvencia acreditada", "Larga estancia, como vivienda habitual"],
+  "112929079": ["1 mes", null, null],
+  "112998093": ["1 mes", null, null],
+  "109169901": ["1 mes", null, null],
+  "112935495": ["1 mes", null, null],
+  "112924702": [null, "Contrato de trabajo indefinido y tres últimas nóminas", null],
+  "112914837": ["1 mes", null, null],
+  "112896636": ["2 meses", null, "12 meses (contrato temporal)"],
+  "108455539": ["1 mes", "1 mes de depósito; aval bancario o similar", "1 año mínimo (larga estancia)"],
+  "104735066": [null, null, null],
+  "112630158": ["1 mes", "1 mes de garantía adicional", null],
+  "108267836": ["1 mes", null, null]
+});
 
 
-const REVISADO = "11 nov. 2026 (Peñascales, 12 nov.)";
+const REVISADO = "11 nov. 2026 (los añadidos después llevan su propio aviso)";
 const KEY = "pisos-madrid-estado-v2";
 // estado[id] = {s: favorito de Sophie, m: favorito de Miguel, d: descartado}
 let estado = {};
@@ -280,7 +363,7 @@ function marcar(id, k){
 
 // Avisos de cambios detectados al revisar el anuncio: tipo "baja", "sube", "cond" (condiciones) o "retirado"
 function avisos(p){
-  const ICONO = {baja:"▼", sube:"▲", cond:"●", retirado:"✕"};
+  const ICONO = {baja:"▼", sube:"▲", cond:"●", retirado:"✕", pend:"…"};
   return (p.cambios||[]).map(c => `<div class="aviso ${c.tipo}"><b>${ICONO[c.tipo]||"●"} ${c.texto}</b><span>Detectado el ${c.fecha}</span></div>`).join("");
 }
 
@@ -290,7 +373,7 @@ function condiciones(p){
   return `<dl class="cond">
     <div><dt>Fianza</dt><dd>${fianza}</dd></div>
     <div><dt>Garantías adicionales</dt><dd>${c[1] || "sin especificar"}</dd></div>
-    <div><dt>Contrato mínimo</dt><dd>sin especificar</dd></div>
+    <div><dt>Contrato mínimo</dt><dd>${c[2] || "sin especificar"}</dd></div>
   </dl>`;
 }
 
