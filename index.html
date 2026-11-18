@@ -37,6 +37,7 @@
   #enlace{width:100%;font:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--line);border-radius:8px}
   .head{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;padding:18px 20px 12px;flex-wrap:wrap}
   .head h2{margin:0;font-size:19px}
+  .cole{font-size:15px;font-weight:700;margin:3px 0 2px}
   .zona{color:var(--muted);font-size:14px}
   .badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:#eef3f0;color:var(--accent);margin-left:6px;vertical-align:middle}
   .badge.s{background:#f6ecf5;color:#7a2f74}
@@ -111,6 +112,7 @@
       <select id="orden">
         <option value="precio">Precio (menor a mayor)</option>
         <option value="nuevo">Últimos añadidos</option>
+        <option value="cole">Más cerca del colegio</option>
         <option value="m2">Superficie (mayor a menor)</option>
         <option value="em2">€/m² (menor a mayor)</option>
       </select>
@@ -129,7 +131,7 @@
 const IMG = "https://img4.idealista.com/blur/WEB_DETAIL/0/id.pro.es.image.master/";
 // origen: "S" = enviado por Sophie, "M" = pestaña abierta por Miguel
 const PISOS = [
-  {id:"112837717", origen:"S", titulo:"Ático en Calle de Jorge Juan", zona:"Fuente del Berro", precio:2600, m2:103, hab:2, planta:"5ª exterior, ascensor",
+  {id:"112837717", origen:"S", titulo:"Ático en Calle de Jorge Juan", zona:"Fuente del Berro", precio:2600, precioAnterior:2750, m2:103, hab:2, planta:"5ª exterior, ascensor",
    fotos:{salon:"9f/66/2e/1483835710.jpg", cocina:"ce/3b/d1/1483835713.jpg", dorm:"57/38/d9/1483835775.jpg"},
    det:["98 m² útiles","2 baños","Terraza","Amueblado","Calefacción central","Aire acondicionado"],
    nota:"«Este es ideal pero más caro»"},
@@ -156,7 +158,7 @@ const PISOS = [
   {id:"112532232", origen:"M", titulo:"Piso en Calle del Marqués de Mondéjar", zona:"Fuente del Berro", precio:1900, m2:100, hab:2, planta:"3ª interior, ascensor",
    fotos:{salon:"74/19/d3/1473663489.jpg", cocina:"12/7c/16/1473663473.jpg", dorm:"7a/e1/76/1473663531.jpg"},
    det:["2 baños","Amueblado","Armarios empotrados","Aire acondicionado"]},
-  {id:"112832221", origen:"M", titulo:"Piso en Fuente del Berro", zona:"Barrio de Salamanca", precio:1950, m2:90, hab:2, planta:"5ª exterior, ascensor",
+  {id:"112832221", origen:"M", titulo:"Piso en Fuente del Berro", zona:"Barrio de Salamanca", precio:1950, precioAnterior:2250, m2:90, hab:2, planta:"5ª exterior, ascensor",
    fotos:{salon:"9b/81/e4/1483650589.jpg", cocina:"2e/31/bc/1483650530.jpg", dorm:"10/b2/d0/1483650563.jpg"},
    det:["2 baños","Orientación sur","Sin amueblar","Calefacción individual","Aire acondicionado"]},
   {id:"111924115", origen:"M", titulo:"Piso en Calle de Hermosilla", zona:"Goya", precio:2200, m2:93, hab:3, planta:"2ª exterior, ascensor",
@@ -170,16 +172,19 @@ const PISOS = [
    fotos:{salon:"fe/23/3c/1488495372.jpg", cocina:"7e/29/67/1488495368.jpg", dorm:"b7/ab/4a/1488495375.jpg"},
    det:["70 m² útiles","2 baños","Garaje incluido","Orientación oeste","Sin amueblar","Calefacción individual"]},
   {id:"112752242", origen:"M", titulo:"Piso en Fuente del Berro", zona:"Barrio de Salamanca", precio:2550, m2:102, hab:3, planta:"4ª exterior, ascensor",
+   cambios:[{fecha:"17 nov. 2026", tipo:"retirado", texto:"Anuncio retirado de idealista"}],
    fotos:{salon:"20/f2/56/1480909617.jpg", cocina:"f8/52/f6/1480909615.jpg", dorm:"c7/1e/1c/1480909645.jpg"},
    salonEtiqueta:"Estancia",
    det:["2 baños","Trastero","Sin amueblar","Calefacción central","Aire acondicionado"]},
   {id:"112708661", origen:"M", titulo:"Piso en Calle del Príncipe de Vergara", zona:"Castellana", precio:2600, m2:140, hab:4, planta:"3ª exterior, ascensor",
+   cambios:[{fecha:"17 nov. 2026", tipo:"retirado", texto:"Anuncio retirado de idealista"}],
    fotos:{salon:"9f/be/26/1483779485.jpg", cocina:"e3/5a/96/1483779505.jpg", dorm:"14/80/31/1483779488.jpg"},
    det:["129 m² útiles","2 baños","Amueblado","Armarios empotrados","Calefacción central"]},
   {id:"112877321", origen:"M", titulo:"Piso en Calle de Fernán González, 54", zona:"Ibiza", precio:2600, m2:117, hab:2, planta:"2ª exterior, ascensor",
+   cambios:[{fecha:"17 nov. 2026", tipo:"retirado", texto:"Anuncio retirado de idealista"}],
    fotos:{salon:"19/65/db/1485193324.jpg", cocina:"6c/06/03/1485193528.jpg", dorm:"46/d0/af/1485193494.jpg"},
    det:["105 m² útiles","2 baños","Terraza","Orientación este","Amueblado","Aire acondicionado"]},
-  {id:"112528205", origen:"M", titulo:"Ático en Calle de Cartagena", zona:"Prosperidad", precio:2650, m2:106, hab:2, planta:"5ª exterior, ascensor",
+  {id:"112528205", origen:"M", titulo:"Ático en Calle de Cartagena", zona:"Prosperidad", precio:2650, precioAnterior:2800, m2:106, hab:2, planta:"5ª exterior, ascensor",
    fotos:{salon:"7a/de/93/1486745597.jpg", cocina:"40/94/88/1486745576.jpg", dorm:"7e/23/ce/1486745601.jpg"},
    det:["2 baños","Terraza","Garaje incluido","Orientación sur y oeste","Sin amueblar","Calefacción central"]},
   {id:"112394498", origen:"M", titulo:"Piso en Calle de Juan Esplandiú", zona:"Estrella", precio:2700, m2:161, hab:3, planta:"14ª exterior, ascensor",
@@ -206,73 +211,86 @@ const PISOS = [
    det:["2 baños","Amueblado","Armarios empotrados","Calefacción individual","Aire acondicionado"]},
   {id:"110469572", origen:"M", titulo:"Piso en Calle de los Peñascales", zona:"Fuente del Berro", precio:1875, precioAnterior:1975,
    cambios:[{fecha:"12 nov. 2026", tipo:"baja", texto:"Baja de precio: 1.975 € → 1.875 € (−5 %)"}], m2:110, hab:3, planta:"5ª exterior, ascensor",
-   fotos:{salon:"cf/2b/94/1452935691.jpg"},
-   salonEtiqueta:"Foto principal",
+   fotos:{salon:"cf/2b/94/1452935691.jpg", cocina:"7a/fd/8e/1452935662.jpg", dorm:"5e/d1/05/1452935778.jpg"},
+   salonEtiqueta:"Terraza",
    det:["2 baños","2 balcones","Sin amueblar","Cocina americana equipada","Calefacción central","Aire acondicionado","Conserje"]},
   {id:"89791904", origen:"M", titulo:"Piso en Calle de Méjico", zona:"Guindalera", precio:2200, m2:95, hab:3, planta:"1ª exterior, ascensor",
-   fotos:{salon:"32/9c/ed/1491861663.jpg"}, salonEtiqueta:"Terraza",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"08/51/0d/1491861707.jpg", cocina:"d7/4e/02/1491861738.jpg", dorm:"8f/64/85/1491861708.jpg"},
    det:["2 baños", "Terraza y balcón", "Sin amueblar", "Calefacción central", "Aire acondicionado"]},
   {id:"113069666", origen:"M", titulo:"Piso en Calle Alamedilla", zona:"Delicias", precio:2090, m2:133, hab:2, planta:"3ª exterior, ascensor",
-   fotos:{salon:"04/34/de/1491939240.jpg"}, salonEtiqueta:"Dormitorio",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"88/4c/e1/1491939219.jpg", cocina:"3f/15/a6/1491939260.jpg", dorm:"04/34/de/1491939240.jpg"}, salonEtiqueta:"Estancia",
    det:["2 baños", "Terraza", "Garaje", "Trastero", "Sin amueblar", "Aire acondicionado"]},
   {id:"113061025", origen:"M", titulo:"Piso en Calle de los Peñascales, 68", zona:"Fuente del Berro", precio:2190, m2:100, hab:3, planta:"4ª exterior, ascensor",
-   fotos:{salon:"c1/e6/c5/1491603404.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"36/f1/93/1492720259.jpg", cocina:"53/cc/4f/1491603381.jpg", dorm:"82/2b/2d/1492720384.jpg"},
    det:["80 m² útiles", "2 baños", "Amueblado", "Garaje opcional 110 €/mes", "Orientación norte", "Calefacción individual", "Aire acondicionado"]},
   {id:"113039855", origen:"M", titulo:"Piso en Calle de la Fuente del Berro", zona:"Goya", precio:2400, m2:105, hab:4, planta:"6ª interior, ascensor",
-   fotos:{salon:"08/a5/8f/1490883892.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"08/a5/8f/1490883892.jpg", cocina:"b4/55/1f/1490883854.jpg", dorm:"9e/82/7b/1490883621.jpg"},
    det:["2 baños", "Sin amueblar", "Calefacción central", "Aire acondicionado"]},
   {id:"113032206", origen:"M", titulo:"Piso en Calle del Doctor Esquerdo, 124", zona:"Niño Jesús", precio:1900, precioAnterior:2100, m2:75, hab:2, planta:"3ª exterior, ascensor",
-   fotos:{salon:"d5/4e/d7/1490582899.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"d5/4e/d7/1490582899.jpg", cocina:"b5/70/c6/1490582900.jpg", dorm:"c9/9f/80/1490582929.jpg"},
    det:["2 baños", "Balcón", "Amueblado", "Calefacción central", "Aire acondicionado"]},
   {id:"112929079", origen:"M", titulo:"Piso en Avenida del Mediterráneo, 59", zona:"Estrella", precio:2100, m2:104, hab:3, planta:"3ª exterior, ascensor",
-   fotos:{salon:"62/16/b1/1490083248.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"62/16/b1/1490083248.jpg", dorm:"3b/7a/86/1490083289.jpg"},
    det:["2 baños", "Balcón", "Garaje (opcional 120 €/mes o incluido: confirmar)", "Calefacción individual", "Aire acondicionado"]},
   {id:"112998093", origen:"M", titulo:"Piso en Avenida de la Ciudad de Barcelona, 192", zona:"Adelfas", precio:2280, m2:110, hab:4, planta:"4ª exterior, ascensor",
-   fotos:{salon:"3a/a3/a0/1489373206.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"3a/a3/a0/1489373206.jpg", cocina:"6d/7e/db/1489373267.jpg", dorm:"f5/47/a1/1489373285.jpg"},
    det:["105 m² útiles", "2 baños", "Garaje incluido", "Sin amueblar", "Calefacción individual", "Aire acondicionado"]},
   {id:"109169901", origen:"M", titulo:"Piso en Avenida de Nazaret, 13", zona:"Niño Jesús", precio:2395, m2:100, hab:2, planta:"3ª exterior, ascensor",
-   fotos:{salon:"a2/5c/0b/1366338275.jpg"}, salonEtiqueta:"Piscina",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"05/dd/fb/1366338246.jpg", cocina:"ec/94/49/1366338252.jpg", dorm:"a5/0f/ae/1366338222.jpg"},
    det:["2 baños", "Amueblado", "Trastero", "Garaje opcional 150 €/mes", "Piscina y jardín comunitarios", "Aire acondicionado"]},
   {id:"112935495", origen:"M", titulo:"Piso en Calle de Játiva", zona:"Adelfas", precio:2250, m2:120, hab:3, planta:"6ª exterior, ascensor",
-   fotos:{salon:"39/3a/6a/1487209835.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"39/3a/6a/1487209835.jpg", cocina:"cf/b6/0e/1487209837.jpg", dorm:"b9/74/56/1487209831.jpg"},
    det:["100 m² útiles", "2 baños", "Balcón", "Garaje", "Amueblado", "Calefacción individual", "Aire acondicionado"]},
   {id:"112924702", origen:"M", titulo:"Piso en Calle de Nuestra Señora de Guadalupe", zona:"Guindalera", precio:2000, m2:108, hab:2, planta:"3ª exterior, ascensor",
-   fotos:{salon:"2f/62/83/1486833263.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"2f/62/83/1486833263.jpg", cocina:"f0/92/15/1486833323.jpg", dorm:"79/b2/57/1486833317.jpg"},
    det:["94 m² útiles", "2 baños", "2 balcones", "Sin amueblar", "Calefacción individual"]},
   {id:"112914837", origen:"M", titulo:"Piso en Bocángel", zona:"Fuente del Berro", precio:2400, m2:111, hab:4, planta:"3ª exterior, ascensor",
-   fotos:{salon:"20/56/0e/1486945919.jpg"}, salonEtiqueta:"Vistas",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"ed/b2/48/1486779266.jpg", cocina:"79/a3/1a/1486779254.jpg", dorm:"56/df/bc/1486779219.jpg"},
    det:["102 m² útiles", "2 baños", "Terraza", "Amueblado", "Calefacción individual", "Aire acondicionado"]},
   {id:"112896636", origen:"M", titulo:"Ático en Guindalera", zona:"Guindalera", precio:2300, m2:86, hab:2, planta:"4ª exterior, ascensor",
-   fotos:{salon:"92/de/46/1485881603.jpg"}, salonEtiqueta:"Terraza",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"81/5a/d5/1490706245.jpg", cocina:"78/55/b8/1485881653.jpg", dorm:"b2/f8/af/1485881341.jpg"},
    det:["76 m² útiles", "2 baños", "Terraza de 20 m²", "Trastero", "Amueblado", "Calefacción individual", "Aire acondicionado"]},
   {id:"108455539", origen:"M", titulo:"Piso en Calle de Núñez de Balboa, 31", zona:"Recoletos", precio:2300, m2:90, hab:2, planta:"4ª exterior, ascensor",
-   fotos:{salon:"59/7c/7a/1486098578.jpg"}, salonEtiqueta:"Vistas",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"95/4c/e6/1486098538.jpg", cocina:"1f/a6/8e/1486099386.jpg", dorm:"01/fc/e0/1486098622.jpg"},
    det:["2 baños", "Amueblado o sin amueblar", "Orientación oeste", "Calefacción central", "Aire acondicionado"]},
   {id:"104735066", origen:"M", titulo:"Piso en Calle de Félix Rodríguez de la Fuente", zona:"Media Legua", precio:1550, m2:100, hab:3, planta:"7ª exterior, ascensor",
    fotos:{salon:"5a/2d/4d/1230037136.jpg"}, salonEtiqueta:"Salón",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   cambios:[{fecha:"17 nov. 2026", tipo:"retirado", texto:"Anuncio retirado de idealista"}],
    det:["85 m² útiles", "2 baños", "Terraza", "Garaje incluido", "Sin amueblar", "Calefacción individual", "Aire acondicionado"]},
   {id:"112630158", origen:"M", titulo:"Piso en Calle del Comercio", zona:"Pacífico", precio:1750, m2:100, hab:3, planta:"2ª exterior, ascensor",
-   fotos:{salon:"5f/a8/39/1476489393.jpg"}, salonEtiqueta:"Cocina",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
+   fotos:{salon:"ab/34/de/1476489463.jpg", cocina:"5f/a8/39/1476489393.jpg", dorm:"60/1e/3e/1476489464.jpg"}, salonEtiqueta:"Estancia", dormEtiqueta:"Estancia",
    det:["2 baños", "Terraza", "Sin amueblar", "Calefacción central"]},
-  {id:"108267836", origen:"M", titulo:"Piso en Calle Fuenterrabía", zona:"Pacífico", precio:2300, m2:145, hab:2, planta:"5ª exterior, ascensor",
-   fotos:{salon:"5a/43/8c/1339035062.jpg"}, salonEtiqueta:"Estancia",
-   cambios:[{fecha:"15 nov. 2026", tipo:"pend", texto:"Pendiente de verificar en idealista: precio, condiciones y resto de fotos"}],
-   det:["130 m² útiles", "2 baños", "Terraza", "Sin amueblar", "Calefacción central", "Aire acondicionado"]}
+  {id:"108267836", origen:"M", titulo:"Piso en Calle Fuenterrabía", zona:"Pacífico", precio:2200, m2:145, hab:2, planta:"5ª exterior, ascensor",
+   fotos:{salon:"5a/43/8c/1339035062.jpg", cocina:"43/9f/de/1339035090.jpg", dorm:"9d/63/c8/1339035115.jpg"}, salonEtiqueta:"Estancia", dormEtiqueta:"Estancia",
+   cambios:[{fecha:"17 nov. 2026", tipo:"cond", texto:"Precio corregido al verificar el anuncio: 2.200 € (la primera lectura daba 2.300 €)"}],
+   det:["130 m² útiles", "2 baños", "Terraza", "Sin amueblar", "Calefacción central", "Aire acondicionado"]},
+  {id:"112562037", origen:"M", titulo:"Piso en Calle de Menorca", zona:"Ibiza", precio:2150, m2:113, hab:4, planta:"2ª exterior, ascensor",
+   fotos:{salon:"3f/c3/06/1474096464.jpg", cocina:"a5/bb/66/1474096414.jpg", dorm:"6c/84/1f/1474096465.jpg"}, salonEtiqueta:"Estancia", dormEtiqueta:"Estancia",
+   det:["2 baños", "Terraza", "Sin amueblar"]},
+  {id:"113101242", origen:"M", titulo:"Piso en Paseo del Marqués de Zafra, 35", zona:"Fuente del Berro", precio:2200, m2:120, hab:3, planta:"5ª interior, ascensor",
+   fotos:{salon:"95/bd/f6/1493047299.jpg", cocina:"6f/e9/87/1493048288.jpg", dorm:"b8/9d/f5/1493047411.jpg"}, salonEtiqueta:"Vistas", dormEtiqueta:"Estancia",
+   det:["93 m² útiles", "2 baños", "Terraza", "Orientación este", "Amueblado", "Calefacción central", "Aire acondicionado"]},
+  {id:"113092345", origen:"M", titulo:"Piso en Paseo del Marqués de Zafra, 33", zona:"Fuente del Berro", precio:2100, m2:101, hab:3, planta:"3ª exterior, ascensor",
+   fotos:{salon:"2b/80/de/1493116280.jpg", cocina:"eb/65/b4/1493019980.jpg", dorm:"65/28/16/1493017768.jpg"}, salonEtiqueta:"Vistas",
+   det:["83 m² útiles", "2 baños", "Orientación oeste", "Amueblado", "Calefacción central", "Aire acondicionado"]},
+  {id:"112569089", origen:"M", titulo:"Piso en Calle de Agustín Querol", zona:"Jerónimos", precio:2500, m2:147, hab:3, planta:"6ª exterior, ascensor",
+   fotos:{salon:"18/61/5e/1474376547.jpg", cocina:"2a/91/c4/1474376551.jpg", dorm:"69/23/2e/1474376548.jpg"}, salonEtiqueta:"Estancia", dormEtiqueta:"Estancia",
+   det:["117 m² útiles", "2 baños", "Sin amueblar", "Calefacción central", "Aire acondicionado"]},
+  {id:"103687179", origen:"M", titulo:"Piso en Calle del General Díaz Porlier, 99", zona:"Lista", precio:2600, m2:170, hab:4, planta:"2ª exterior, ascensor",
+   fotos:{salon:"d0/7c/6a/1211208729.jpg", cocina:"c9/87/34/1197108969.jpg", dorm:"01/89/92/1197108916.jpg"}, dormEtiqueta:"Estancia",
+   det:["2 baños", "Orientación este", "Sin amueblar", "Armarios empotrados"]},
+  {id:"112955521", origen:"M", titulo:"Piso en Ventas", zona:"Ciudad Lineal", precio:1800, m2:114, hab:4, planta:"2ª exterior, ascensor",
+   fotos:{salon:"51/67/1d/1487921838.jpg", cocina:"14/e2/73/1487921832.jpg", dorm:"2f/ed/7f/1487921814.jpg"},
+   det:["106 m² útiles", "2 baños", "Garaje opcional 125 €/mes", "Amueblado", "Calefacción individual", "Aire acondicionado"]},
+  {id:"112910071", origen:"M", titulo:"Piso en Calle de José Ortega y Gasset", zona:"Lista", precio:2700, m2:110, hab:3, planta:"1ª exterior, ascensor",
+   fotos:{salon:"93/be/32/1486328329.jpg", cocina:"f1/10/9f/1486328334.jpg", dorm:"b1/96/87/1486328339.jpg"},
+   det:["103 m² útiles", "2 baños", "Orientación sur", "Amueblado", "Calefacción central", "Aire acondicionado"]},
+  {id:"102071148", origen:"M", titulo:"Piso en Calle del Marqués de Lozoya, 2", zona:"Estrella", precio:2300, m2:158, hab:3, planta:"1ª exterior, ascensor",
+   fotos:{salon:"16/a0/2d/1143265053.jpg", cocina:"5a/5a/f6/1143256340.jpg", dorm:"20/c1/e1/1143256557.jpg"},
+   det:["3 baños", "Balcón", "Garaje incluido", "Amueblado", "Calefacción central"]},
+  {id:"112873411", origen:"M", titulo:"Piso en Calle de Juan de Urbieta", zona:"Niño Jesús", precio:2400, m2:128, hab:3, planta:"1ª exterior, ascensor",
+   fotos:{salon:"25/e0/1b/1485078029.jpg", cocina:"50/a3/de/1485078018.jpg", dorm:"3c/62/c6/1485078019.jpg"}, dormEtiqueta:"Estancia",
+   det:["2 baños", "Garaje incluido", "Trastero", "Sin amueblar", "Calefacción individual", "Aire acondicionado"]}
 ];
 
 // Condiciones leídas en cada anuncio (11 nov. 2026). Lo que el anuncio no indica queda "sin especificar".
@@ -287,8 +305,20 @@ const COND = {
   "1951799": ["1 mes"], "109674166": ["1 mes"], "110237391": ["1 mes"], "112532232": ["1 mes"], "112708661": ["1 mes"], "112832221": ["1 mes"],
   "112837717": ["1 mes"], "112877321": ["1 mes"], "112900033": ["1 mes"], "112919990": ["1 mes"], "113018974": ["1 mes"]
 };
+// Ruta a pie hasta el Colegio Trilema Safa (C. de Mercedes Fórmica, 32) según Google Maps, 17 nov. 2026:
+// [minutos, distancia, 1 si idealista oculta la dirección exacta y se ha medido desde el centro de la zona que muestra]
+const COLE = {"1072388": [14, "1,0 km", 0], "30181843": [14, "1,0 km", 0], "1951799": [29, "1,9 km", 0], "89791904": [26, "1,9 km", 1], "102071148": [17, "1,2 km", 0], "103687179": [28, "2,0 km", 0], "106856943": [18, "1,3 km", 0], "108267836": [41, "2,8 km", 1], "108455539": [24, "1,7 km", 0], "109169901": [26, "1,7 km", 0], "109674166": [29, "1,9 km", 1], "110237391": [24, "1,7 km", 0], "110469572": [8, "600 m", 1], "111924115": [14, "1,0 km", 1], "112394498": [17, "1,1 km", 1], "112417150": [21, "1,5 km", 1], "112528205": [37, "2,7 km", 1], "112532232": [12, "850 m", 1], "112562037": [20, "1,5 km", 1], "112569089": [43, "3,0 km", 1], "112630158": [48, "3,2 km", 1], "112699188": [13, "950 m", 1], "113039855": [13, "950 m", 1], "112832221": [12, "900 m", 1], "112837717": [1, "61 m", 1], "112847366": [40, "2,9 km", 1], "112873411": [28, "1,9 km", 1], "112896636": [25, "1,8 km", 1], "112900033": [11, "850 m", 1], "112910071": [16, "1,2 km", 1], "112914837": [18, "1,2 km", 1], "112919990": [21, "1,5 km", 1], "112924702": [23, "1,7 km", 1], "112929079": [36, "2,4 km", 0], "112932515": [32, "2,3 km", 1], "112935495": [50, "3,3 km", 1], "112955521": [15, "1,0 km", 1], "112998093": [46, "3,0 km", 0], "113018974": [41, "3,0 km", 1], "113032206": [32, "2,1 km", 0], "113061025": [4, "290 m", 0], "113069666": [58, "3,9 km", 1], "113092345": [8, "600 m", 0], "113101242": [8, "600 m", 0]};
 const MESES = {"1 mes": 1, "2 meses": 2};
 Object.assign(COND, {
+  "112562037": [null, null, null],
+  "113101242": ["1 mes", null, null],
+  "113092345": ["1 mes", null, null],
+  "112569089": [null, null, null],
+  "103687179": ["1 mes", null, null],
+  "112955521": ["1 mes", "Contrato indefinido con al menos 1 año de antigüedad; ingresos mínimos demostrables de 4.500 €/mes; vida laboral y nómina; seguro de impago", null],
+  "112910071": ["1 mes", "1 mes de garantía; ingresos mínimos solicitados de 7.000 €/mes", "Larga duración, más de un año"],
+  "102071148": ["1 mes", null, null],
+  "112873411": [null, null, null],
   "89791904": ["1 mes", null, null],
   "113069666": [null, null, "12 meses o más (larga estancia)"],
   "113061025": ["1 mes", null, null],
@@ -300,15 +330,15 @@ Object.assign(COND, {
   "112935495": ["1 mes", null, null],
   "112924702": [null, "Contrato de trabajo indefinido y tres últimas nóminas", null],
   "112914837": ["1 mes", null, null],
-  "112896636": ["2 meses", null, "12 meses (contrato temporal)"],
-  "108455539": ["1 mes", "1 mes de depósito; aval bancario o similar", "1 año mínimo (larga estancia)"],
+  "112896636": ["2 meses", "Solvencia a consultar con el anunciante", "12 meses (alquiler de temporada)"],
+  "108455539": ["1 mes", "1 mes de depósito; aval bancario o similar", "11 meses mínimo"],
   "104735066": [null, null, null],
-  "112630158": ["1 mes", "1 mes de garantía adicional", null],
+  "112630158": ["1 mes", "1 mes de garantía adicional; contrato de trabajo y tres últimas nóminas", null],
   "108267836": ["1 mes", null, null]
 });
 
 
-const REVISADO = "11 nov. 2026 (los añadidos después llevan su propio aviso)";
+const REVISADO = "17 nov. 2026";
 const KEY = "pisos-madrid-estado-v2";
 // estado[id] = {s: favorito de Sophie, m: favorito de Miguel, d: descartado}
 let estado = {};
@@ -386,6 +416,7 @@ function tarjeta(p){
     <div class="head">
       <div>
         <h2>${p.titulo}<span class="badge ${p.origen==="S"?"s":""}">${p.origen==="S"?"De Sophie":"De Miguel"}</span>${e.s?'<span class="check s">✓ Sophie</span>':""}${e.m?'<span class="check m">✓ Miguel</span>':""}${sup?'<span class="badge sup">★★ SuperFavorito</span>':""}</h2>
+        ${COLE[p.id] ? `<div class="cole" title="Ruta a pie hasta el Colegio Trilema Safa según Google Maps">🚸 ${COLE[p.id][1]} · ${COLE[p.id][0]} min andando al colegio Trilema Safa${COLE[p.id][2] ? " (aprox.)" : ""}</div>` : ""}
         <div class="zona">${p.zona}, Madrid · ${p.hab} hab. · ${p.planta}</div>
       </div>
       <div class="nums">
@@ -499,7 +530,7 @@ function pintar(){
   Object.keys(FILTRO).forEach(v => document.getElementById("n-"+v).textContent = de(v).length);
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.v===vista));
   const o = document.getElementById("orden").value;
-  const lista = de(vista).sort((a,b) => o==="nuevo" ? PISOS.indexOf(b)-PISOS.indexOf(a) : o==="precio" ? a.precio-b.precio : o==="m2" ? b.m2-a.m2 : a.precio/a.m2 - b.precio/b.m2);
+  const lista = de(vista).sort((a,b) => o==="nuevo" ? PISOS.indexOf(b)-PISOS.indexOf(a) : o==="cole" ? (COLE[a.id]?COLE[a.id][0]:999)-(COLE[b.id]?COLE[b.id][0]:999) : o==="precio" ? a.precio-b.precio : o==="m2" ? b.m2-a.m2 : a.precio/a.m2 - b.precio/b.m2);
   const vacio = {rev:"No queda ninguna vivienda: están todas descartadas.", fs:"Sophie todavía no ha marcado ningún favorito.", fm:"Miguel todavía no ha marcado ningún favorito.", sup:"Todavía no hay ningún piso que sea favorito de los dos.", des:"No hay ninguna vivienda descartada."};
   document.getElementById("lista").innerHTML = lista.length ? lista.map(tarjeta).join("") : `<p class="empty">${vacio[vista]}</p>`;
 }
